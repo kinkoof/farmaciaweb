@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main Page</title>
+</head>
+<body>
+    <a href="{% url 'login' %}"><button>faca login ou crie sua conta</button></a></li>
+    {% if request.session.user_info %}
+        <li><a href="{% url 'logout'%}"><button>Logout</button></a></li>
+    {% endif %}
+
+    <h1>Farmácias Cadastradas</h1>
+    <ul>
+        {% for farmacia in farmacias %}
+            <li>{{ farmacia.nomeFantasia }} - {{ farmacia.endereco }}</li>
+        {% endfor %}
+    </ul>
+
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastre sua farmacia</title>
+</head>
+<body>
+    <form action="{% url 'valida_cadastro_farmacia' %}" method="POST"> {% csrf_token %} 
+
+        <label >email do responsavel</label>
+        <input type="text" name="emailResponsavel">
+
+        <label >Nome do responsavel</label>
+        <input type="text" name="nomeResponsavel">
+
+        <label >Cpf</label>
+        <input type="number" name="cpf">
+
+        <label >celular</label>
+        <input type="number" name="celular">
+
+        <label >endereco</label>
+        <input type="text" name="endereco">
+
+        <label >nome fantasia</label>
+        <input type="text" name="nomeFantasia">
+
+        <label >cnpj</label>
+        <input type="number" name="cnpj">
+
+        <label >Conta bancaria</label>
+        <input type="number" name="contaBancaria">
+
+        <label >Senha</label>
+        <input type="password" name="senha">
+
+        <label >Confirme a senha</label>
+        <input type="password">
+
+        <input type="submit" value="registrar sua loja">
+    </form>
+
+</body>
+</html>

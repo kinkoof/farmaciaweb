@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro</title>
+</head>
+<body>
+    <form action="{% url 'valida_cadastro' %}" method="POST" > {% csrf_token %}
+        <label >Nome completo</label>
+        <input type="text" name="nome">
+
+        <label >Email</label>
+        <input type="email" name="email">
+
+        <label >Senha</label>
+        <input type="password" name="senha">
+
+        <label >Confirme a senha</label>
+        <input type="password">
+
+        <input type="submit" value="registrar">
+    </form>
+
+    <a href="{% url 'login' %}"><button>faca login</button></a></li>
+    <a href="{% url 'cadastro_farmacia' %}"><button>crie uma conta para sua farmacia</button></a></li>
+</body>
+</html>
