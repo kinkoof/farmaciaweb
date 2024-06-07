@@ -1,45 +1,90 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastre sua farmacia</title>
-</head>
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock head %}
+
+
+
+{% block body %}
+
 <body>
-    <form action="{% url 'valida_cadastro_farmacia' %}" method="POST"> {% csrf_token %} 
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 margem">
+                <form action="{% url 'valida_cadastro_farmacia' %}" method="POST" class="mt-5">
+                    {% csrf_token %}
+                    <h1>Registre-se</h1>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="floatingInput" name="emailResponsavel">
+                                <label for="floatingInput">email do responsável</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="floatingInput" name="cpf">
+                                <label for="floatingInput">CPF</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="floatingInput" name="endereco">
+                                <label for="floatingInput">Endereço</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="floatingInput" name="cnpj">
+                                <label for="floatingInput">CNPJ</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="floatingPassword" name="senha">
+                                <label for="floatingPassword">Senha</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="floatingInput" name="nomeResponsavel">
+                                <label for="floatingInput">Nome do responsável</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="floatingInput" name="celular">
+                                <label for="floatingInput">Celular</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="floatingInput" name="nomeFantasia">
+                                <label for="floatingInput">Nome fantasia</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="floatingInput" name="contaBancaria">
+                                <label for="floatingInput">Conta bancária</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="floatingPasswordConfirm"
+                                    name="senhaConfirm">
+                                <label for="floatingPasswordConfirm">Confirme sua senha</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <input type="submit" class="btn btn-outline-success" value="registre-se" id="botaologin">
+                    </div>
+                </form>
 
-        <label >email do responsavel</label>
-        <input type="text" name="emailResponsavel">
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
 
-        <label >Nome do responsavel</label>
-        <input type="text" name="nomeResponsavel">
-
-        <label >Cpf</label>
-        <input type="number" name="cpf">
-
-        <label >celular</label>
-        <input type="number" name="celular">
-
-        <label >endereco</label>
-        <input type="text" name="endereco">
-
-        <label >nome fantasia</label>
-        <input type="text" name="nomeFantasia">
-
-        <label >cnpj</label>
-        <input type="number" name="cnpj">
-
-        <label >Conta bancaria</label>
-        <input type="number" name="contaBancaria">
-
-        <label >Senha</label>
-        <input type="password" name="senha">
-
-        <label >Confirme a senha</label>
-        <input type="password">
-
-        <input type="submit" value="registrar sua loja">
-    </form>
+                <div class="mt-3 text-center">
+                    <a href="{% url 'login' %}" class="btn btn-secondary mb-2">faça login</a>
+                    <a href="{% url 'cadastro_farmacia' %}" class="btn btn-secondary mb-2">crie uma conta para sua
+                        farmácia</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
-</html>
+
+{% endblock body %}

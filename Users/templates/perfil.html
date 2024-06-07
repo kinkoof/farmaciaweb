@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock head %}
+
+
+
+{% block body %}
+<h1>Perfil do Usuário</h1>
+
+<p>Email: {{ user_info.email }}</p>
+<p>Nome: {{ user_info.nome }}</p>
+<p>Senha: {{ user_info.senha }}</p>
+
+
+<a href="{% url 'logout' %}">Logout</a>
+
+{% endblock body %}

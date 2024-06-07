@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock head %}
+
+
+
+{% block body %}
+<h1>Perfil do Usuário</h1>
+
+<p>Email: {{ user_info.email }}</p>
+<p>Nome Fantasia: {{ user_info.nomeFantasia }}</p>
+<p>Celular: {{ user_info.celular }}</p>
+<p>Cnpj: {{ user_info.cnpj }}</p>
+<p>Cpf: {{ user_info.cpf }}</p>
+<p>Endereço: {{ user_info.endereco }}</p>
+<p>Nome: {{ user_info.nome }}</p>
+<p>Senha: {{ user_info.senha }}</p>
+
+
+<a href="{% url 'logout' %}">Logout</a>
+
+{% endblock body %}

@@ -2,8 +2,16 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('perfil/', views.perfil, name="perfil"),
+    path('perfilFarmacia/', views.perfilFarmacia, name="perfilFarmacia"),
+
+    path('loja/', views.loja, name="loja"),
+
     path('login/', views.login, name="login"),
     path('validaLogin', views.validaLogin, name="valida_login"),
+
+    path('loginFarmacia/', views.loginFarmacia, name="login_farmacia"),
+    path('validaloginFarmacia/', views.validaLoginFarmacia, name="valida_login_farmacia"),
 
     path('cadastro/', views.cadastro, name="cadastro"),
     path('validaCadastro/', views.validaCadastro, name="valida_cadastro"),
