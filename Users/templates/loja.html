@@ -13,49 +13,54 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-6 margem">
-            <form action="{% url 'adicionarItem' %}" method="POST" class="mt-5">
+            <form action="{% url 'adicionarItem' %}" method="POST" class="mt-5" enctype="multipart/form-data">
                 {% csrf_token %}
 
-                <h1>Adiconar item</h1>
+                <h1>Adicionar item</h1>
                 <hr>
 
                 <div class="form-floating mb-3">
-                    <input type="file" class="form-control" id="floatingInput" name="imagem_item" accept="image/*">
+                    <input type="file" class="form-control" id="imagem" name="imagem">
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="floatingInput" name="nome_item">
-                    <label for="floatingInput">Nome</label>
+                    <input type="text" class="form-control" id="nome_item" name="nome_item">
+                    <label for="nome_item">Nome</label>
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="number" class="form-control" id="floatingInput" name="preco_item">
-                    <label for="floatingInput">Preço</label>
+                    <input type="number" class="form-control" id="preco_item" name="preco_item">
+                    <label for="preco_item">Preço</label>
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input class="form-control" id="floatingInput" name="descricao_item">
-                    <label for="floatingPassword">descricao</label>
+                    <input class="form-control" id="descricao_item" name="descricao_item">
+                    <label for="descricao_item">Descrição</label>
                 </div>
 
                 <div class="d-grid gap-2">
-                    <input type="submit" class="btn btn-outline-success" value="adicionar item" id="botaologin">
+                    <input type="submit" class="btn btn-outline-success" value="Adicionar item" id="botaologin">
                 </div>
             </form>
+
         </div>
     </div>
 </div>
-
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
 
 {% for item in itens %}
-    <div class="item">
-        <h3>{{ item.nome }}</h3>
-        <p>Preço: R$ {{ item.preco }}</p>
-        <p>Descrição: {{ item.descricao }}</p>
-        <img src="{{ item.imagem_url }}" alt="{{ item.nome }}" style="max-width: 200px;">
-    </div>
+<div class="item">
+    <h2>{{ item.nome }}</h2>
+    <p>Preço: R$ {{ item.preco }}</p>
+    <p>Descrição: {{ item.descricao }}</p>
+    <img src="{{ item.imagem_url }}" alt="{{ item.nome }}">
+</div>
+<hr>
 {% endfor %}
-
 
 
 {% endblock body %}

@@ -1,8 +1,13 @@
 from django.shortcuts import redirect, render
 from django.contrib import messages
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
+from firebase_admin import credentials, storage ,firestore
+from google.cloud import storage
+import os
+
+# Define a variável de ambiente GOOGLE_APPLICATION_CREDENTIALS
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "cred.json"
+
 
 # iniciar o banco de dados
 if not firebase_admin._apps:
@@ -12,24 +17,34 @@ if not firebase_admin._apps:
 db = firestore.client()
 
 
+
+
+
 # Create your views here.
 
 # carrega o html de login
 def login(request):
     return render(request, "login.html")
 
+
 def loginFarmacia(request):
     return render(request, "login_farmacia.html")
 
 # carrega o html de cadastro
+
+
 def cadastro(request):
     return render(request, "cadastro.html")
 
 # carrega o html de cadastro de farmacias
+
+
 def cadastroFarmacia(request):
     return render(request, "cadastro_farmacia.html")
 
 # envio e verificação das informaçoes de cadastro de usuario
+
+
 def validaCadastro(request):
     nome = request.POST.get("nome")
     email = request.POST.get("email")
@@ -49,6 +64,8 @@ def validaCadastro(request):
     return redirect("../login/")
 
 # envio e verificação das informaçoes de cadastro de farmacias
+
+
 def validaCadastroFarmacia(request):
     if request.method == "POST":
         emailResponsavel = request.POST.get("emailResponsavel")
@@ -95,6 +112,8 @@ def validaCadastroFarmacia(request):
         return redirect("../cadastroFarmacia/")
 
 # verificacao da requisicao de login
+
+
 def validaLogin(request):
     if request.method == "POST":
         email = request.POST.get("email")
@@ -128,6 +147,7 @@ def validaLogin(request):
     else:
         return redirect("login/")
 
+
 def validaLoginFarmacia(request):
     if request.method == "POST":
         email = request.POST.get("email")
@@ -138,7 +158,8 @@ def validaLoginFarmacia(request):
             return redirect("../loginFarmacia/")
 
         try:
-            farmacias_ref = db.collection('farmacias').where('email', '==', email).where('senha', '==', senha).stream()
+            farmacias_ref = db.collection('farmacias').where(
+                'email', '==', email).where('senha', '==', senha).stream()
 
             farmacia_info = None
             for farmacia in farmacias_ref:
@@ -162,9 +183,12 @@ def validaLoginFarmacia(request):
         return redirect("../loginFarmacia/")
 
 # logout
+
+
 def logout(request):
     request.session.flush()
     return redirect('../login/')
+
 
 def perfil(request):
     user_info = request.session.get('user_info')
@@ -176,6 +200,7 @@ def perfil(request):
         return redirect("../login/")
 
     return render(request, 'perfil.html', {'user_info': user_info})
+
 
 def perfilFarmacia(request):
 
@@ -189,11 +214,11 @@ def perfilFarmacia(request):
 
     return render(request, 'perfilFarmacia.html', {'user_info': user_info})
 
+
 def loja(request):
     loja_info = request.session.get('user_info')
     user_type = request.session.get('user_type')
     farmacia_id = request.session.get('farmacia_id')
-
 
     if not loja_info or user_type != 'farmacia':
         messages.error(
@@ -203,28 +228,59 @@ def loja(request):
     itens_ref = db.collection('itens').where('farmacia_id', '==', farmacia_id).stream()
     itens = [item.to_dict() for item in itens_ref]
 
+    # Adicione a URL da imagem ao dicionário 'itens'
+    for item in itens:
+        # Se 'imagem_url' estiver presente no item, adicione a URL ao dicionário
+        if 'imagem_url' in item:
+            item['imagem_url'] = item['imagem_url']
+
     return render(request, 'loja.html', {'itens': itens})
 
+
 def adicionarItem(request):
+
     farmacia_id = request.session.get('farmacia_id')
 
     if request.method == "POST":
         nome_item = request.POST.get("nome_item")
         preco_item = request.POST.get("preco_item")
         descricao_item = request.POST.get("descricao_item")
+        imagem = request.FILES.get("imagem")
 
-        # Cria o dicionário de dados para o novo item
-    data = {
+        data = {
             "nome": nome_item,
             "preco": preco_item,
             "descricao": descricao_item,
             "farmacia_id": farmacia_id
         }
 
-        # Adiciona o novo item à coleção 'itens'
-    doc_ref = db.collection('itens').document()
-    doc_ref.set(data)
+        if imagem:
+            # Initialize Firebase Storage client
+            storage_client = storage.Client()
 
-    messages.success(request, "Item adicionado com sucesso.")
+            # Define the bucket name
+            bucket_name = "farmacia-1fdf6.appspot.com"
 
-    return redirect("../loja/")
+            # Get a reference to the bucket
+            bucket = storage_client.bucket(bucket_name)
+
+            # Upload the file to Cloud Storage
+            blob = bucket.blob(imagem.name)
+            blob.upload_from_file(imagem)
+
+            # Get the URL of the uploaded file
+            imagem_url = blob.public_url
+
+            # Add the image URL to the data
+            data["imagem_url"] = imagem_url
+
+        # Adicionar o novo item à coleção no Firestore
+        doc_ref = db.collection('itens').document()
+        doc_ref.set(data)
+
+        messages.success(request, "Item adicionado com sucesso.")
+
+        return redirect("../loja/")
+    else:
+        # Handle GET request, if needed
+        pass
