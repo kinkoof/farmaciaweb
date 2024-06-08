@@ -15,10 +15,22 @@ db = firestore.client()
 
 def home(request):
     todas_farmacias = db.collection('farmacias').stream()
-    farmacias = [farmacia.to_dict() for farmacia in todas_farmacias]
+    farmacias = [{'id': farmacia.id, **farmacia.to_dict()} for farmacia in todas_farmacias]
 
     context = {
         'farmacias': farmacias,
     }
 
     return render(request, 'mainpage.html', context)
+
+
+def famaciaLoja(request, farmacia_id):
+
+    farmacia_ref = db.collection('farmacias').document(farmacia_id)
+    farmacia = farmacia_ref.get().to_dict()
+
+    itens_ref = db.collection('itens').where('farmacia_id', '==', farmacia_id).stream()
+    itens = [item.to_dict() for item in itens_ref]
+
+
+    return render(request, 'famaciaLoja.html', {'farmacia': farmacia, 'itens': itens})

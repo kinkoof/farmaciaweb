@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock head %}
+
+
+
+{% block body %}
+<h1>Detalhes da Farmácia</h1>
+<p>Nome Fantasia: {{ farmacia.nomeFantasia }}</p>
+<p>Endereço: {{ farmacia.endereco }}</p>
+
+{% for item in itens %}
+    <div class="item">
+        <img src="{{ item.imagem_url }}" alt="{{ item.nome }}" style="max-width: 200px;">
+        <h3>{{ item.nome }}</h3>
+        <p>Preço: R$ {{ item.preco }}</p>
+        <p>Descrição: {{ item.descricao }}</p>
+    </div>
+{% endfor %}
+
+{% endblock body %}

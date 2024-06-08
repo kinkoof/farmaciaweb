@@ -13,7 +13,7 @@
     <h1>Farmácias Cadastradas</h1>
     <ul>
         {% for farmacia in farmacias %}
-            <li>{{ farmacia.nomeFantasia }} - {{ farmacia.endereco }}</li>
+            <li><a href="/famaciaLoja/{{farmacia.id}}">{{ farmacia.nomeFantasia }} - {{ farmacia.endereco }}</a></li>
         {% endfor %}
     </ul>
 

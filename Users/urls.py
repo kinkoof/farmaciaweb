@@ -6,6 +6,7 @@ urlpatterns = [
     path('perfilFarmacia/', views.perfilFarmacia, name="perfilFarmacia"),
 
     path('loja/', views.loja, name="loja"),
+    path('adcionarItem/', views.adicionarItem, name="adicionarItem"),
 
     path('login/', views.login, name="login"),
     path('validaLogin', views.validaLogin, name="valida_login"),

@@ -13,31 +13,24 @@ db = firestore.client()
 
 
 # Create your views here.
+
 # carrega o html de login
 def login(request):
     return render(request, "login.html")
-
 
 def loginFarmacia(request):
     return render(request, "login_farmacia.html")
 
 # carrega o html de cadastro
-
-
 def cadastro(request):
     return render(request, "cadastro.html")
 
 # carrega o html de cadastro de farmacias
-
-
 def cadastroFarmacia(request):
     return render(request, "cadastro_farmacia.html")
 
 # envio e verificação das informaçoes de cadastro de usuario
-
-
 def validaCadastro(request):
-
     nome = request.POST.get("nome")
     email = request.POST.get("email")
     senha = request.POST.get("senha")
@@ -56,8 +49,6 @@ def validaCadastro(request):
     return redirect("../login/")
 
 # envio e verificação das informaçoes de cadastro de farmacias
-
-
 def validaCadastroFarmacia(request):
     if request.method == "POST":
         emailResponsavel = request.POST.get("emailResponsavel")
@@ -104,8 +95,6 @@ def validaCadastroFarmacia(request):
         return redirect("../cadastroFarmacia/")
 
 # verificacao da requisicao de login
-
-
 def validaLogin(request):
     if request.method == "POST":
         email = request.POST.get("email")
@@ -139,7 +128,6 @@ def validaLogin(request):
     else:
         return redirect("login/")
 
-
 def validaLoginFarmacia(request):
     if request.method == "POST":
         email = request.POST.get("email")
@@ -150,8 +138,7 @@ def validaLoginFarmacia(request):
             return redirect("../loginFarmacia/")
 
         try:
-            farmacias_ref = db.collection('farmacias').where(
-                'email', '==', email).where('senha', '==', senha).stream()
+            farmacias_ref = db.collection('farmacias').where('email', '==', email).where('senha', '==', senha).stream()
 
             farmacia_info = None
             for farmacia in farmacias_ref:
@@ -162,6 +149,7 @@ def validaLoginFarmacia(request):
             if farmacia_info:
                 request.session['user_info'] = farmacia_info
                 request.session['user_type'] = 'farmacia'
+                request.session['farmacia_id'] = farmacia.id
                 return redirect("../../")
             else:
                 messages.error(request, "Email ou senha inválidos.")
@@ -174,12 +162,9 @@ def validaLoginFarmacia(request):
         return redirect("../loginFarmacia/")
 
 # logout
-
-
 def logout(request):
     request.session.flush()
     return redirect('../login/')
-
 
 def perfil(request):
     user_info = request.session.get('user_info')
@@ -191,7 +176,6 @@ def perfil(request):
         return redirect("../login/")
 
     return render(request, 'perfil.html', {'user_info': user_info})
-
 
 def perfilFarmacia(request):
 
@@ -205,40 +189,42 @@ def perfilFarmacia(request):
 
     return render(request, 'perfilFarmacia.html', {'user_info': user_info})
 
-
 def loja(request):
+    loja_info = request.session.get('user_info')
+    user_type = request.session.get('user_type')
+    farmacia_id = request.session.get('farmacia_id')
+
+
+    if not loja_info or user_type != 'farmacia':
+        messages.error(
+            request, "Você precisa estar logado para acessar esta página.")
+        return redirect("../login/")
+
+    itens_ref = db.collection('itens').where('farmacia_id', '==', farmacia_id).stream()
+    itens = [item.to_dict() for item in itens_ref]
+
+    return render(request, 'loja.html', {'itens': itens})
+
+def adicionarItem(request):
+    farmacia_id = request.session.get('farmacia_id')
 
     if request.method == "POST":
         nome_item = request.POST.get("nome_item")
         preco_item = request.POST.get("preco_item")
         descricao_item = request.POST.get("descricao_item")
 
-    loja_info  = request.session.get('user_info')
-    user_type = request.session.get('user_type')
-
-    if not loja_info  or user_type != 'farmacia':
-        messages.error(
-            request, "Você precisa estar logado para acessar esta página.")
-        return redirect("../login/")
-
-    loja_id = loja_info.get('id')  # Assume que 'id' é o identificador da loja
-
         # Cria o dicionário de dados para o novo item
-    item_data = {
+    data = {
             "nome": nome_item,
             "preco": preco_item,
             "descricao": descricao_item,
-            "loja_id": loja_id
+            "farmacia_id": farmacia_id
         }
 
         # Adiciona o novo item à coleção 'itens'
-    db.collection('itens').add(item_data)
+    doc_ref = db.collection('itens').document()
+    doc_ref.set(data)
 
     messages.success(request, "Item adicionado com sucesso.")
-    
-    itens_ref = db.collection('itens').where('loja_id', '==', loja_id).stream()
-    itens = [item.to_dict() for item in itens_ref]
 
-    return render(request, 'pagina_loja.html', {'itens': itens})
-
-
+    return redirect("../loja/")
