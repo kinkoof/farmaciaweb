@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    {% block head %} {% endblock head %}
+    {% block head %}
+
+    {% endblock head %}
 
     <title>{% block title %} {% endblock title %}</title>
 
@@ -15,18 +17,31 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'home' %}">Med Search</a>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
+            <a class="navbar-brand" href="{% url 'home' %}">Brand</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
                     </li>
+                </ul>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    {% if request.session.user_type == 'usuario' %}
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'perfil' %}">Perfil</a>
+                    </li>
+                    {% elif request.session.user_type == 'farmacia' %}
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'perfilFarmacia' %}">Perfil
+                            Farmácia</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'loja' %}">Minha loja</a>
+                    </li>
+                    {% endif %}
                     {% if request.session.user_info %}
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{% url 'logout' %}">Logout</a>
@@ -35,36 +50,19 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{% url 'login' %}">Login</a>
                     </li>
-                    {% endif%}
-
-                    {% if request.session.user_type == 'usuario' %}
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'perfil' %}">Perfil</a>
-                    </li>
-                    {% elif request.session.user_type == 'farmacia' %}
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'perfilFarmacia' %}">Perfil Farmácia</a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'loja' %}">Minha loja</a>
-                    </li>
                     {% endif %}
 
                 </ul>
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
             </div>
         </div>
     </nav>
 
+
     {% block body %} {% endblock body %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-    crossorigin="anonymous"></script>
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>

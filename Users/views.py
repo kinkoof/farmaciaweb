@@ -78,6 +78,7 @@ def validaCadastroFarmacia(request):
         contaBancaria = request.POST.get("contaBancaria")
         senha = request.POST.get("senha")
         senhaConfirm = request.POST.get("senhaConfirm")
+        imagem = request.FILES.get("imagem")
 
         # Verificação de campos obrigatórios
         if not all([emailResponsavel, nomeResponsavel, cpf, celular, endereco, nomeFantasia, cnpj, contaBancaria, senha, senhaConfirm]):
@@ -100,9 +101,35 @@ def validaCadastroFarmacia(request):
             "contaBancaria": contaBancaria,
         }
 
+        if imagem:
+            try:
+                # Initialize Firebase Storage client
+                storage_client = storage.Client()
+
+                # Define the bucket name
+                bucket_name = "farmacia-1fdf6.appspot.com"
+
+                # Get a reference to the bucket
+                bucket = storage_client.bucket(bucket_name)
+
+                # Upload the file to Cloud Storage
+                blob = bucket.blob(imagem.name)
+                blob.upload_from_file(imagem)
+
+                # Get the URL of the uploaded file
+                imagem_url = blob.public_url
+
+                # Add the image URL to the data
+                data["imagem_perfil"] = imagem_url
+            except Exception as e:
+                messages.error(request, f"Erro ao fazer upload da imagem: {e}")
+                return redirect("../cadastroFarmacia/")
+
         try:
+            db = firestore.client()  # Initialize Firestore client
             doc_ref = db.collection('farmacias').document()
             doc_ref.set(data)
+
             messages.success(request, "Cadastro realizado com sucesso!")
             return redirect("../loginFarmacia/")
         except Exception as e:
