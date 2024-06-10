@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock head %}
+
+
+
+{% block body %}
+<style>
+    .profile-card img {
+        width: 150px;
+        /* Tamanho da imagem */
+        height: 150px;
+        /* Tamanho da imagem */
+        object-fit: cover;
+        /* Ajusta a imagem para cobrir o espaço sem distorção */
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="card profile-card">
+        <div class="card-header">
+            <h1 class="card-title text-center">Perfil do Usuário</h1>
+        </div>
+        <div class="card-body">
+            <form action="{% url 'editar_usuario' %}" method="POST" class="mt-5">
+                {% csrf_token %}
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="floatingInput" placeholder="Email"
+                        value="{{ user_info.email }}" name="email">
+                    <label for="floatingInput">Email</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="floatingInput" placeholder="Nome"
+                        value="{{ user_info.nome }}" name="nome">
+                    <label for="floatingInput">Nome</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="floatingInput" placeholder="Senha"
+                        value="{{ user_info.senha }}" name="senha">
+                    <label for="floatingInput">Senha</label>
+                </div>
+                <a href="{% url 'perfil' %}" class="btn btn-danger mt-3">Cancelar</a>
+                <button type="submit" class="btn btn-success mt-3">Confirmar Edição</button>
+            </form>
+
+
+        </div>
+    </div>
+</div>
+
+{% endblock body %}

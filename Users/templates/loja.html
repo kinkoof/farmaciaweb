@@ -3,7 +3,7 @@
 
 
 {% block head %}
-<link rel="stylesheet" href="{% static 'css/loja.css' %}">
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
 {% endblock head %}
 
 
@@ -15,12 +15,8 @@
         <div class="col-md-6 margem">
             <form action="{% url 'adicionarItem' %}" method="POST" class="mt-5" enctype="multipart/form-data">
                 {% csrf_token %}
-
-                <h1>Adicionar item</h1>
-                <hr>
-
-                <div class="form-floating mb-3">
-                    <input type="file" class="form-control" id="imagem" name="imagem">
+                <div class="mb-3">
+                    <input class="form-control form-control-lg" type="file" id="formFile" name="imagem">
                 </div>
 
                 <div class="form-floating mb-3">
@@ -37,9 +33,9 @@
                     <input class="form-control" id="descricao_item" name="descricao_item">
                     <label for="descricao_item">Descrição</label>
                 </div>
-
+                <br>
                 <div class="d-grid gap-2">
-                    <input type="submit" class="btn btn-outline-success" value="Adicionar item" id="botaologin">
+                    <input type="submit" class="btn btn-custom mx-auto" type="button" value="Adicionar item" id="botaologin">
                 </div>
             </form>
 

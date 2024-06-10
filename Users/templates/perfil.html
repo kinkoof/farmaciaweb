@@ -27,11 +27,18 @@
         </div>
         <div class="card-body">
             <p class="card-text"><strong>Email:</strong> {{ user_info.email }}</p>
+            <p class="card-text"><strong>ID:</strong> {{ id}}</p>
             <p class="card-text"><strong>Nome:</strong> {{ user_info.nome }}</p>
             <p class="card-text"><strong>Senha:</strong> {{ user_info.senha }}</p>
             <a href="{% url 'logout' %}" class="btn btn-danger mt-3">Logout</a>
+            <a href="{% url 'editar_usuario' %}" class="btn btn-danger mt-3">Editar Perfil</a>
         </div>
     </div>
 </div>
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
 
 {% endblock body %}

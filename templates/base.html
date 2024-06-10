@@ -28,26 +28,24 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+
                     {% if request.session.user_type == 'usuario' %}
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'perfil' %}">Perfil</a>
+                        <a class="nav-link active links" aria-current="page" href="{% url 'perfil' %}">Perfil</a>
                     </li>
                     {% elif request.session.user_type == 'farmacia' %}
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'perfilFarmacia' %}">Perfil
+                        <a class="nav-link active links" aria-current="page" href="{% url 'perfilFarmacia' %}">Perfil
                             Farmácia</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'loja' %}">Minha loja</a>
                     </li>
                     {% endif %}
                     {% if request.session.user_info %}
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'logout' %}">Logout</a>
+                        <a class="nav-link active links" aria-current="page" href="{% url 'logout' %}">Logout</a>
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'login' %}">Login</a>
+                        <a class="nav-link active links" aria-current="page" href="{% url 'login' %}">Login</a>
                     </li>
                     {% endif %}
 
@@ -69,11 +67,17 @@
 
 </html>
 <style>
-    *{
-        font-family:Verdana, Geneva, Tahoma, sans-serif;
+    * {
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-size: large;
     }
+
     html,
     body {
         background-color: #FBF5F3;
+    }
+
+    .links:hover {
+        color: #48bbc6 !important;
     }
 </style>

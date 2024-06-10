@@ -1,23 +1,47 @@
 .card-hover {
-    margin: 40px;
-    background-color: #FBF5F3;
-    text-decoration: none;
-    color: black;
-    border: none;
-    transition: box-shadow 0.3s ease-in-out;
+margin: 40px;
+background-color: #fbf5f3;
+text-decoration: none;
+color: black;
+border: none;
+transition: box-shadow 0.3s ease-in-out;
 }
 .card-hover:hover {
-    text-decoration: none;
-    color: black;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+text-decoration: none;
+color: black;
+box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 .card-hover a {
-    text-decoration: none;
-    color: inherit;
+text-decoration: none;
+color: inherit;
 }
 .card-hover a:hover {
-    color: inherit;
+color: inherit;
 }
 .card-hover img {
-    border-radius: 0;
+border-radius: 0;
+}
+
+.card-hover {
+transition: transform 0.3s;
+}
+.card-hover:hover {
+transform: scale(1.05);
+}
+.image-container {
+width: 100%;
+height: 200px; /* Altura fixa para todas as imagens */
+overflow: hidden; /* Esconde partes da imagem que ultrapassarem o contêiner */
+}
+.image-container img {
+width: 100%;
+height: 100%;
+object-fit: cover; /* Garante que a imagem cubra todo o contêiner */
+object-position: center; /* Centraliza a imagem dentro do contêiner */
+}
+
+.img-farmacia {
+width: 100%;
+height: 200px; /* ou o tamanho que você preferir */
+object-fit: contain;
 }

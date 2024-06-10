@@ -1,9 +1,10 @@
 from django.shortcuts import redirect, render
 from django.contrib import messages
 import firebase_admin
-from firebase_admin import credentials, storage ,firestore
+from firebase_admin import credentials, storage, firestore, auth, exceptions
 from google.cloud import storage
 import os
+
 
 # Define a variável de ambiente GOOGLE_APPLICATION_CREDENTIALS
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "cred.json"
@@ -15,9 +16,6 @@ if not firebase_admin._apps:
     firebase_admin.initialize_app(cred)
 
 db = firestore.client()
-
-
-
 
 
 # Create your views here.
@@ -163,6 +161,8 @@ def validaLogin(request):
             if user_info:
                 request.session['user_info'] = user_info
                 request.session['user_type'] = 'usuario'
+                request.session['user_id'] = user.id
+
                 return redirect("../../")
             else:
                 messages.error(request, "Email ou senha inválidos.")
@@ -220,26 +220,38 @@ def logout(request):
 def perfil(request):
     user_info = request.session.get('user_info')
     user_type = request.session.get('user_type')
+    id = request.session.get('user_id')
 
     if not user_info or user_type != 'usuario':
         messages.error(
             request, "Você precisa estar logado para acessar esta página.")
         return redirect("../login/")
 
-    return render(request, 'perfil.html', {'user_info': user_info})
+    return render(request, 'perfil.html', {'user_info': user_info, 'id': id})
 
 
 def perfilFarmacia(request):
 
     user_info = request.session.get('user_info')
     user_type = request.session.get('user_type')
+    farmacia_id = request.session.get('farmacia_id')
 
     if not user_info or user_type != 'farmacia':
         messages.error(
             request, "Você precisa estar logado para acessar esta página.")
         return redirect("../login/")
 
-    return render(request, 'perfilFarmacia.html', {'user_info': user_info})
+    itens_ref = db.collection('itens').where(
+        'farmacia_id', '==', farmacia_id).stream()
+    itens = [item.to_dict() for item in itens_ref]
+
+    # Adicione a URL da imagem ao dicionário 'itens'
+    for item in itens:
+        # Se 'imagem_url' estiver presente no item, adicione a URL ao dicionário
+        if 'imagem_url' in item:
+            item['imagem_url'] = item['imagem_url']
+
+    return render(request, 'perfilFarmacia.html', {'user_info': user_info, 'itens': itens})
 
 
 def loja(request):
@@ -252,7 +264,8 @@ def loja(request):
             request, "Você precisa estar logado para acessar esta página.")
         return redirect("../login/")
 
-    itens_ref = db.collection('itens').where('farmacia_id', '==', farmacia_id).stream()
+    itens_ref = db.collection('itens').where(
+        'farmacia_id', '==', farmacia_id).stream()
     itens = [item.to_dict() for item in itens_ref]
 
     # Adicione a URL da imagem ao dicionário 'itens'
@@ -311,3 +324,43 @@ def adicionarItem(request):
     else:
         # Handle GET request, if needed
         pass
+
+
+def editarUsuario(request):
+    user_info = request.session.get('user_info')
+    user_type = request.session.get('user_type')
+    id = request.session.get('user_id')
+
+    if not user_info or user_type != 'usuario':
+        messages.error(
+            request, "Você precisa estar logado para acessar esta página.")
+        return redirect("../login/")
+
+    if request.method == "POST":
+        # Obter dados do formulário
+        novo_email = request.POST.get("email")
+        novo_nome = request.POST.get("nome")
+        nova_senha = request.POST.get("senha")
+
+        # Atualizar os dados do usuário no banco de dados
+        try:
+            db.collection('usuario').document(id).update({
+                'email': novo_email,
+                'nome': novo_nome,
+                'senha': nova_senha
+            })
+
+            # Atualizar os dados da sessão
+            user_info['email'] = novo_email
+            user_info['nome'] = novo_nome
+            user_info['senha'] = nova_senha
+            request.session['user_info'] = user_info
+
+            messages.success(request, "Dados atualizados com sucesso.")
+            return redirect("/auth/perfil/")
+        except Exception as e:
+            messages.error(request, f"Erro ao tentar atualizar os dados: {e}")
+            print(id)
+            return redirect("/auth/perfil/")
+    else:
+        return render(request, 'editar_usuario.html', {'user_info': user_info})
