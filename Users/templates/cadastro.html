@@ -9,7 +9,7 @@
 
 
 {% block body %}
-<body>
+<!-- <body>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-6 margem">
@@ -54,6 +54,64 @@
     </div>
 
 
-</body>
+</body> -->
+
+
+<div class="container">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-md-6">
+            <img src="{% static 'img/logo.png' %}" class="img-fluid" alt="">
+        </div>
+        <div class="col-md-6">
+            <h1 class="text-center" style="font-weight:900;">Seja Bem vindo</h1>
+            <p class="text-center">Crie sua conta</p>
+            <form action="{% url 'valida_cadastro' %}" method="POST" class="mt-5">
+                {% csrf_token %}
+                
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="floatingInput" placeholder="..." name="nome">
+                    <label for="floatingInput">Nome completo</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com"
+                        name="email">
+                    <label for="floatingInput">Email</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
+                        name="senha">
+                    <label for="floatingPassword">Senha</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                    <label for="floatingPassword">Confirme sua senha</label>
+                </div>
+
+                <div class="row">
+                    <div class="col text-start">
+                        <a href="{% url 'cadastro_farmacia' %}" class="hover-a">Seja um colaborador</a>
+                    </div>
+                    <div class="col text-end">
+                        <a href="{% url 'login' %}" class="hover-a">Ja possui conta? Clique aqui</a>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <input type="submit" class="btn btn-custom mx-auto" type="button" value="Registre-se" id="botaologin">
+                </div>
+            </form>
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
 
 {% endblock body %}

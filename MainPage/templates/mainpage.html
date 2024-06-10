@@ -3,24 +3,47 @@
 
 
 {% block head %}
-<link rel="stylesheet" href="{% static 'css/login.css' %}">
+<link rel="stylesheet" href="{% static 'css/mainpage.css' %}">
 {% endblock head %}
 
 
 {% block title %}
-    main page
+main page
 {% endblock title %}
 
 
 {% block body %}
-<body>
-    <h1>Farmácias Cadastradas</h1>
-    <ul>
-        {% for farmacia in farmacias %}
-            <li><a href="/famaciaLoja/{{farmacia.id}}">{{ farmacia.nomeFantasia }} - {{ farmacia.endereco }}</a></li>
-        {% endfor %}
-    </ul>
 
+<body>
+
+  <div class="container">
+    <h1 class="text-center">Farmácias Disponíveis</h1>
+    <div class="row justify-content-center">
+
+      {% for farmacia in farmacias %}
+      <div class="col-12 col-md-8 mb-3">
+        <a href="/famaciaLoja/{{ farmacia.id }}" class="card card-hover">
+          <div class="row no-gutters">
+            <div class="col-md-4">
+              <img src="{{ farmacia.imagem_perfil }}" class="img-fluid rounded" alt="Imagem da Farmácia">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">{{ farmacia.nomeFantasia }}</h5>
+                <p class="card-text">{{ farmacia.endereco }}</p>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+      <br>
+      <br>
+      {% endfor %}
+
+    </div>
+  </div>
 
 </body>
+
+
 {% endblock body %}

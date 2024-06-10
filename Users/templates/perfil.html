@@ -9,13 +9,29 @@
 
 
 {% block body %}
-<h1>Perfil do Usuário</h1>
+<style>
+    .profile-card img {
+        width: 150px;
+        /* Tamanho da imagem */
+        height: 150px;
+        /* Tamanho da imagem */
+        object-fit: cover;
+        /* Ajusta a imagem para cobrir o espaço sem distorção */
+    }
+</style>
 
-<p>Email: {{ user_info.email }}</p>
-<p>Nome: {{ user_info.nome }}</p>
-<p>Senha: {{ user_info.senha }}</p>
-
-
-<a href="{% url 'logout' %}">Logout</a>
+<div class="container mt-4">
+    <div class="card profile-card">
+        <div class="card-header">
+            <h1 class="card-title text-center">Perfil do Usuário</h1>
+        </div>
+        <div class="card-body">
+            <p class="card-text"><strong>Email:</strong> {{ user_info.email }}</p>
+            <p class="card-text"><strong>Nome:</strong> {{ user_info.nome }}</p>
+            <p class="card-text"><strong>Senha:</strong> {{ user_info.senha }}</p>
+            <a href="{% url 'logout' %}" class="btn btn-danger mt-3">Logout</a>
+        </div>
+    </div>
+</div>
 
 {% endblock body %}

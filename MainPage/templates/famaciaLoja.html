@@ -3,26 +3,44 @@
 
 
 {% block head %}
-<link rel="stylesheet" href="{% static 'css/login.css' %}">
+<link rel="stylesheet" href="{% static 'css/farmaciaLoja.css' %}">
 {% endblock head %}
 
-
-
 {% block body %}
-<h1>Detalhes da Farmácia</h1>
-<p>Nome Fantasia: {{ farmacia.nomeFantasia }}</p>
-<p>Endereço: {{ farmacia.endereco }}</p>
+<div class="container mt-4">
+    <div class="card profile-card">
 
-{% for item in itens %}
-<div class="item">
-    <h2>{{ item.nome }}</h2>
-    <p>Preço: R$ {{ item.preco }}</p>
-    <p>Descrição: {{ item.descricao }}</p>
-    {% if item.imagem_url %}
-    <img src="{{ item.imagem_url }}" alt="{{ item.nome }}">
-    {% endif %}
+        <div class="card-header d-flex justify-content-center">
+            <img src="{{ farmacia.imagem_perfil }}" alt="Foto de perfil" class="img-fluid rounded mx-auto d-block">
+        </div>
+        <div class="card-body">
+            <p class="card-text"><strong>Nome Fantasia:</strong>{{ farmacia.nomeFantasia }}</p>
+            <p class="card-text"><strong>Celular:</strong> {{ farmacia.celular }}</p>
+            <p class="card-text"><strong>Endereço:</strong> {{ farmacia.endereco }}</p>
+        </div>
+    </div>
 </div>
-{% endfor %}
+
+<div class="container mt-4">
+    <div class="row">
+        {% for item in itens %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="img-container">
+                    <img src="{{ item.imagem_url }}" class="card-img-top" alt="{{ item.nome }}">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.nome }}</h5>
+                    <p class="card-text">Preço: R$ {{ item.preco }}</p>
+                    <p class="card-text">{{ item.descricao }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
 
 
 {% endblock body %}

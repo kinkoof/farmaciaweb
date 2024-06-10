@@ -1,0 +1,6 @@
+.card-img-top {
+    height: 200px;
+    /* Define uma altura fixa para todas as imagens */
+    object-fit: cover;
+    /* Garante que a imagem preencha o espaço sem distorção */
+    }
