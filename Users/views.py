@@ -4,11 +4,11 @@ import firebase_admin
 from firebase_admin import credentials, storage, firestore, auth, exceptions
 from google.cloud import storage
 import os
+import requests
 
 
 # Define a variável de ambiente GOOGLE_APPLICATION_CREDENTIALS
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "cred.json"
-
 
 # iniciar o banco de dados
 if not firebase_admin._apps:
@@ -44,22 +44,67 @@ def cadastroFarmacia(request):
 
 
 def validaCadastro(request):
-    nome = request.POST.get("nome")
-    email = request.POST.get("email")
-    senha = request.POST.get("senha")
+    if request.method == 'POST':
+        nome = request.POST.get("nome")
+        email = request.POST.get("email")
+        senha = request.POST.get("senha")
+        senhaConfirm = request.POST.get("senhaConfirm")
+        logradouro = request.POST.get("logradouro")
+        bairro = request.POST.get("bairro")
+        cep = request.POST.get("cep")
+        cidade = request.POST.get("cidade")
+        estado = request.POST.get("estado")
+        numero = request.POST.get("numero")
 
-    # Cria o dicionário de dados a ser enviado para o Firestore
-    data = {
-        "nome": nome,
-        "email": email,
-        "senha": senha
-    }
+        # Geocodificação do endereço
+        endereco = f"{logradouro}, {numero}, {bairro}, {cidade}, {estado}, {cep}"
+        api_key = 'AIzaSyByrpCG-r7Je9DaRR6OmRmHRNIe6KcTG80'
+        response = requests.get(
+            f'https://maps.googleapis.com/maps/api/geocode/json?address={endereco}&key={api_key}')
+        data = response.json()
 
-    # Adiciona um novo documento à coleção 'usuario'
-    doc_ref = db.collection('usuario').document()
-    doc_ref.set(data)
+        # Debugging: Verifique o status da resposta
+        print("Geocoding API response status:", data['status'])
+        print("Geocoding API response:", data)
 
-    return redirect("../login/")
+        if data['status'] == 'OK':
+            location = data['results'][0]['geometry']['location']
+            latitude = location['lat']
+            longitude = location['lng']
+        else:
+            latitude = None
+            longitude = None
+
+        # Verificação de campos obrigatórios
+        if not all([nome, email, senha, numero, senha, senhaConfirm, estado]):
+            messages.warning(request, "Por favor, preencha todos os campos.")
+            return redirect("../cadastro/")
+
+        if senha != senhaConfirm:
+            messages.warning(request, "As senhas não conferem.")
+            return redirect("../cadastro/")
+
+        # Cria o dicionário de dados a ser enviado para o Firestore
+        user_data = {
+            "nome": nome,
+            "email": email,
+            "senha": senha,
+            "logradouro": logradouro,
+            "bairro": bairro,
+            "cep": cep,
+            "cidade": cidade,
+            "estado": estado,
+            "numero": numero,
+            "latitude": latitude,
+            "longitude": longitude
+        }
+
+        # Adiciona um novo documento à coleção 'usuario'
+        doc_ref = db.collection('usuario').document()
+        doc_ref.set(user_data)
+
+        return redirect("../login/")
+    return render(request, 'cadastro.html')
 
 # envio e verificação das informaçoes de cadastro de farmacias
 
@@ -77,14 +122,39 @@ def validaCadastroFarmacia(request):
         senha = request.POST.get("senha")
         senhaConfirm = request.POST.get("senhaConfirm")
         imagem = request.FILES.get("imagem")
+        logradouro = request.POST.get("logradouro")
+        bairro = request.POST.get("bairro")
+        cep = request.POST.get("cep")
+        cidade = request.POST.get("cidade")
+        estado = request.POST.get("estado")
+        numero = request.POST.get("numero")
+
+        # Geocodificação do endereço
+        endereco = f"{logradouro}, {bairro}, {cidade}, {estado}, {cep}"
+        api_key = 'AIzaSyByrpCG-r7Je9DaRR6OmRmHRNIe6KcTG80'
+        response = requests.get(
+            f'https://maps.googleapis.com/maps/api/geocode/json?address={endereco}&key={api_key}')
+        data = response.json()
+
+        # Debugging: Verifique o status da resposta
+        print("Geocoding API response status:", data['status'])
+        print("Geocoding API response:", data)
+
+        if data['status'] == 'OK':
+            location = data['results'][0]['geometry']['location']
+            latitude = location['lat']
+            longitude = location['lng']
+        else:
+            latitude = None
+            longitude = None
 
         # Verificação de campos obrigatórios
         if not all([emailResponsavel, nomeResponsavel, cpf, celular, endereco, nomeFantasia, cnpj, contaBancaria, senha, senhaConfirm]):
-            messages.error(request, "Por favor, preencha todos os campos.")
+            messages.warning(request, "Por favor, preencha todos os campos.")
             return redirect("../cadastroFarmacia/")
 
         if senha != senhaConfirm:
-            messages.error(request, "As senhas não conferem.")
+            messages.warning(request, "As senhas não conferem.")
             return redirect("../cadastroFarmacia/")
 
         data = {
@@ -97,6 +167,14 @@ def validaCadastroFarmacia(request):
             "nomeFantasia": nomeFantasia,
             "cnpj": cnpj,
             "contaBancaria": contaBancaria,
+            "logradouro": logradouro,
+            "bairro": bairro,
+            "cep": cep,
+            "cidade": cidade,
+            "estado": estado,
+            "numero": numero,
+            "latitude": latitude,
+            "longitude": longitude
         }
 
         if imagem:
@@ -120,7 +198,7 @@ def validaCadastroFarmacia(request):
                 # Add the image URL to the data
                 data["imagem_perfil"] = imagem_url
             except Exception as e:
-                messages.error(request, f"Erro ao fazer upload da imagem: {e}")
+                messages.warning(request, f"Erro ao fazer upload da imagem: {e}")
                 return redirect("../cadastroFarmacia/")
 
         try:
@@ -131,7 +209,7 @@ def validaCadastroFarmacia(request):
             messages.success(request, "Cadastro realizado com sucesso!")
             return redirect("../loginFarmacia/")
         except Exception as e:
-            messages.error(request, f"Erro ao realizar cadastro: {e}")
+            messages.warning(request, f"Erro ao realizar cadastro: {e}")
             return redirect("../cadastroFarmacia/")
     else:
         return redirect("../cadastroFarmacia/")
@@ -145,7 +223,7 @@ def validaLogin(request):
         senha = request.POST.get("senha")
 
         if not email or not senha:
-            messages.error(request, "Por favor, preencha todos os campos.")
+            messages.warning(request, "Por favor, preencha todos os campos.")
             return redirect("login/")
 
         try:
@@ -165,11 +243,11 @@ def validaLogin(request):
 
                 return redirect("../../")
             else:
-                messages.error(request, "Email ou senha inválidos.")
+                messages.warning(request, "Email ou senha inválidos.")
                 return redirect("login/")
 
         except Exception as e:
-            messages.error(request, f"Erro ao tentar fazer login: {e}")
+            messages.warning(request, f"Erro ao tentar fazer login: {e}")
             return redirect("login/")
     else:
         return redirect("login/")
@@ -181,7 +259,7 @@ def validaLoginFarmacia(request):
         senha = request.POST.get("senha")
 
         if not email or not senha:
-            messages.error(request, "Por favor, preencha todos os campos.")
+            messages.warning(request, "Por favor, preencha todos os campos.")
             return redirect("../loginFarmacia/")
 
         try:
@@ -200,11 +278,11 @@ def validaLoginFarmacia(request):
                 request.session['farmacia_id'] = farmacia.id
                 return redirect("../../")
             else:
-                messages.error(request, "Email ou senha inválidos.")
+                messages.warning(request, "Email ou senha inválidos.")
                 return redirect("../loginFarmacia/")
 
         except Exception as e:
-            messages.error(request, f"Erro ao tentar fazer login: {e}")
+            messages.warning(request, f"Erro ao tentar fazer login: {e}")
             return redirect("../loginFarmacia/")
     else:
         return redirect("../loginFarmacia/")
@@ -223,7 +301,7 @@ def perfil(request):
     id = request.session.get('user_id')
 
     if not user_info or user_type != 'usuario':
-        messages.error(
+        messages.warning(
             request, "Você precisa estar logado para acessar esta página.")
         return redirect("../login/")
 
@@ -237,7 +315,7 @@ def perfilFarmacia(request):
     farmacia_id = request.session.get('farmacia_id')
 
     if not user_info or user_type != 'farmacia':
-        messages.error(
+        messages.warning(
             request, "Você precisa estar logado para acessar esta página.")
         return redirect("../login/")
 
@@ -260,7 +338,7 @@ def loja(request):
     farmacia_id = request.session.get('farmacia_id')
 
     if not loja_info or user_type != 'farmacia':
-        messages.error(
+        messages.warning(
             request, "Você precisa estar logado para acessar esta página.")
         return redirect("../login/")
 
@@ -332,7 +410,7 @@ def editarUsuario(request):
     id = request.session.get('user_id')
 
     if not user_info or user_type != 'usuario':
-        messages.error(
+        messages.warning(
             request, "Você precisa estar logado para acessar esta página.")
         return redirect("../login/")
 
@@ -341,25 +419,40 @@ def editarUsuario(request):
         novo_email = request.POST.get("email")
         novo_nome = request.POST.get("nome")
         nova_senha = request.POST.get("senha")
+        novo_cep = request.POST.get("cep")
+        novo_estado = request.POST.get("estado")
+        nova_cidade = request.POST.get("cidade")
+        novo_logradouro = request.POST.get("logradouro")
+        novo_numero = request.POST.get("numero")
 
         # Atualizar os dados do usuário no banco de dados
         try:
             db.collection('usuario').document(id).update({
                 'email': novo_email,
                 'nome': novo_nome,
-                'senha': nova_senha
+                'senha': nova_senha,
+                'cep': novo_cep,
+                'estado': novo_estado,
+                'cidade': nova_cidade,
+                'logradouro': novo_logradouro,
+                'numero': novo_numero,
             })
 
             # Atualizar os dados da sessão
             user_info['email'] = novo_email
             user_info['nome'] = novo_nome
             user_info['senha'] = nova_senha
+            user_info['cep'] = novo_cep
+            user_info['estado'] = novo_estado
+            user_info['cidade'] = nova_cidade
+            user_info['logradouro'] = novo_logradouro
+            user_info['numero'] = novo_numero
             request.session['user_info'] = user_info
 
             messages.success(request, "Dados atualizados com sucesso.")
             return redirect("/auth/perfil/")
         except Exception as e:
-            messages.error(request, f"Erro ao tentar atualizar os dados: {e}")
+            messages.warning(request, f"Erro ao tentar atualizar os dados: {e}")
             print(id)
             return redirect("/auth/perfil/")
     else:

@@ -43,6 +43,40 @@
                         value="{{ user_info.senha }}" name="senha">
                     <label for="floatingInput">Senha</label>
                 </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="floatingCep" placeholder="Cep"
+                        value="{{ user_info.cep }}" name="cep">
+                    <label for="floatingInput">Cep</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="floatingEstado" placeholder="Estado"
+                        name="estado" readonly value="{{ user_info.estado }}">
+                    <label for="floatingInput">Estado</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="floatingCidade" placeholder="Cidade"
+                        name="cidade" readonly value="{{ user_info.cidade }}">
+                    <label for="floatingInput">Cidade</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="floatingBairro" placeholder="Bairro"
+                        name="bairro" readonly value="{{ user_info.bairro }}">
+                    <label for="floatingInput">Bairro</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="floatingLogradouro" placeholder="Logradouro"
+                        name="logradouro" readonly value="{{ user_info.logradouro }}">
+                    <label for="floatingInput">Logradouro</label>
+                </div>
+
+                <div class="form-floating mb-3">
+                    <input type="number" class="form-control" id="floatingNumero" placeholder="Numero"
+                        name="numero" value="{{ user_info.numero }}">
+                    <label for="floatingInput">Numero</label>
+                </div>
+
                 <a href="{% url 'perfil' %}" class="btn btn-danger mt-3">Cancelar</a>
                 <button type="submit" class="btn btn-success mt-3">Confirmar Edição</button>
             </form>
@@ -51,5 +85,44 @@
         </div>
     </div>
 </div>
+<script>
+    document.getElementById('floatingCep').addEventListener('input', function () {
+        let cep = this.value.replace(/\D/g, '');
+        if (cep.length === 8) {
+            let validacep = /^[0-9]{8}$/;
+            if (validacep.test(cep)) {
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!("erro" in data)) {
+                            document.getElementById('floatingLogradouro').value = data.logradouro;
+                            document.getElementById('floatingBairro').value = data.bairro;
+                            document.getElementById('floatingCidade').value = data.localidade;
+                            document.getElementById('floatingEstado').value = data.uf;
+                        } else {
+                            clearAddressFields();
+                            alert("CEP não encontrado.");
+                        }
+                    })
+                    .catch(error => {
+                        clearAddressFields();
+                        console.error('Error fetching CEP:', error);
+                    });
+            } else {
+                clearAddressFields();
+                alert("Formato de CEP inválido.");
+            }
+        } else {
+            clearAddressFields();
+        }
+    });
+
+    function clearAddressFields() {
+        document.getElementById('floatingLogradouro').value = '';
+        document.getElementById('floatingBairro').value = '';
+        document.getElementById('floatingCidade').value = '';
+        document.getElementById('floatingEstado').value = '';
+    }
+</script>
 
 {% endblock body %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/mainpage.css' %}">
+{% endblock head %}
+
+
+{% block title %}
+Pesquisa
+{% endblock title %}
+
+{% block body %}
+<body>
+  <div class="container">
+    <h1>Resultados da Pesquisa para "{{ query }}"</h1>
+    <div class="row justify-content-center">
+      {% if itens %}
+        {% for item in itens %}
+        <div class="col-12 col-md-8 mb-3">
+          <div class="card card-hover">
+            <div class="row no-gutters">
+              <div class="col-md-4">
+                <img src="{{ item.imagem_url }}" class="img-fluid rounded img-item" alt="Imagem do Item">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body">
+                  <h5 class="card-title">{{ item.nome }}</h5>
+                  <p class="card-text">Preço: R$ {{ item.preco }}</p>
+                  <p class="card-text">Farmácia: {{ item.farmacia.nomeFantasia }}</p>
+                  <p class="card-text">{{ item.farmacia.endereco }}</p>
+                  {% if item.farmacia.distancia is not None %}
+                  <p class="card-text">Distância: {{ item.farmacia.distancia|floatformat:2 }} km</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <br><br>
+        {% endfor %}
+      {% else %}
+        <p>Nenhum item encontrado correspondente a "{{ query }}".</p>
+      {% endif %}
+    </div>
+  </div>
+</body>
+{% endblock body %}

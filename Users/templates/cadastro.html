@@ -3,60 +3,12 @@
 
 
 {% block head %}
-<link rel="stylesheet" href="{% static 'css/login.css' %}">
+<link rel="stylesheet" href="{% static 'css/cadastro.css' %}">
 {% endblock head %}
 
 
 
 {% block body %}
-<!-- <body>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6 margem">
-                <form action="{% url 'valida_cadastro' %}" method="POST" class="mt-5">
-                    {% csrf_token %}
-                    <h1>Registre-se</h1>
-                    <hr>
-                    <div class="form-floating mb-3">
-                        <input type="text" class="form-control" id="floatingInput" placeholder="..." name="nome">
-                        <label for="floatingInput">Nome completo</label>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com"
-                            name="email">
-                        <label for="floatingInput">Email</label>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
-                            name="senha">
-                        <label for="floatingPassword">Senha</label>
-                    </div>
-
-                    <div class="form-floating mb-3">
-                        <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-                        <label for="floatingPassword">Confirme sua senha</label>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <input type="submit" class="btn btn-outline-success" value="registre-se" id="botaologin">
-                    </div>
-                </form>
-
-                <div class="mt-3 text-center">
-                    <a href="{% url 'login' %}" class="btn btn-secondary mb-2">faca login</a></li>
-                    <a href="{% url 'cadastro_farmacia' %}" class="btn btn-secondary mb-2">crie uma conta para sua
-                        farmacia</a></li>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-</body> -->
-
-
 <div class="container">
     <div class="row justify-content-center align-items-center">
         <div class="col-md-6">
@@ -67,40 +19,87 @@
             <p class="text-center">Crie sua conta</p>
             <form action="{% url 'valida_cadastro' %}" method="POST" class="mt-5">
                 {% csrf_token %}
-                
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="floatingInput" placeholder="..." name="nome">
-                    <label for="floatingInput">Nome completo</label>
-                </div>
-
-                <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com"
-                        name="email">
-                    <label for="floatingInput">Email</label>
-                </div>
-
-                <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
-                        name="senha">
-                    <label for="floatingPassword">Senha</label>
-                </div>
-
-                <div class="form-floating mb-3">
-                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-                    <label for="floatingPassword">Confirme sua senha</label>
-                </div>
 
                 <div class="row">
-                    <div class="col text-start">
-                        <a href="{% url 'cadastro_farmacia' %}" class="hover-a">Seja um colaborador</a>
-                    </div>
-                    <div class="col text-end">
-                        <a href="{% url 'login' %}" class="hover-a">Ja possui conta? Clique aqui</a>
-                    </div>
-                </div>
+                    <div class="col-md-6">
 
-                <div class="d-grid gap-2">
-                    <input type="submit" class="btn btn-custom mx-auto" type="button" value="Registre-se" id="botaologin">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="floatingNome" placeholder="..." name="nome"
+                                required>
+                            <label for="floatingInput">Nome completo</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="floatingEmail" placeholder="name@example.com"
+                                name="email" required>
+                            <label for="floatingInput">Email</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="number" class="form-control" id="floatingCep" placeholder="Cep" name="cep"
+                                required>
+                            <label for="floatingInput">Cep</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="floatingEstado" placeholder="Estado"
+                                name="estado" readonly required>
+                            <label for="floatingInput">Estado</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
+                                name="senha" required>
+                            <label for="floatingPassword">Senha</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="floatingCidade" placeholder="Cidade"
+                                name="cidade" readonly>
+                            <label for="floatingInput">Cidade</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="floatingBairro" placeholder="Bairro"
+                                name="bairro" readonly>
+                            <label for="floatingInput">Bairro</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="floatingLogradouro" placeholder="Logradouro"
+                                name="logradouro" readonly>
+                            <label for="floatingInput">Logradouro</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="number" class="form-control" id="floatingNumero" placeholder="Numero"
+                                name="numero" required>
+                            <label for="floatingInput">Numero</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
+                                name="senhaConfirm" required>
+                            <label for="floatingPassword">Confirme sua senha</label>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="col text-start">
+                            <a href="{% url 'cadastro_farmacia' %}" class="hover-a">Seja um colaborador</a>
+                        </div>
+                        <div class="col text-end">
+                            <a href="{% url 'login' %}" class="hover-a">Ja possui conta? Clique aqui</a>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <input type="submit" class="btn mx-auto btn-custom fs-5" type="button" value="Registre-se"
+                            id="botaologin">
+                    </div>
                 </div>
             </form>
             {% if messages %}
@@ -113,5 +112,47 @@
     </div>
 </div>
 
+<script>
+    
+        function clearAddressFields() {
+        document.getElementById('floatingLogradouro').value = '';
+        document.getElementById('floatingBairro').value = '';
+        document.getElementById('floatingCidade').value = '';
+        document.getElementById('floatingEstado').value = '';
+    }
+
+    document.getElementById('floatingCep').addEventListener('input', function () {
+        let cep = this.value.replace(/\D/g, '');
+        if (cep.length === 8) {
+            let validacep = /^[0-9]{8}$/;
+            if (validacep.test(cep)) {
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!("erro" in data)) {
+                            document.getElementById('floatingLogradouro').value = data.logradouro;
+                            document.getElementById('floatingBairro').value = data.bairro;
+                            document.getElementById('floatingCidade').value = data.localidade;
+                            document.getElementById('floatingEstado').value = data.uf;
+                        } else {
+                            clearAddressFields();
+                            alert("CEP não encontrado.");
+                        }
+                    })
+                    .catch(error => {
+                        clearAddressFields();
+                        console.error('Error fetching CEP:', error);
+                    });
+            } else {
+                clearAddressFields();
+                alert("Formato de CEP inválido.");
+            }
+        } else {
+            clearAddressFields();
+        }
+    });
+
+
+</script>
 
 {% endblock body %}
