@@ -10,7 +10,7 @@ box-shadow: #48bbc679 0px 4px 8px -2px, #48bbc613 0px 0px 0px 1px;
 
 .btn-custom {
 color: #48bbc6;
-font-weight: bold;
+/* font-weight: bold; */
 border-radius: 10px;
 height: 100%;
 width: 45%;

@@ -13,20 +13,19 @@ main page
 
 
 {% block body %}
-
 <body>
   <div class="container">
     <br>
     <div class="row justify-content-center">
-      <div class="col-12 col-md-8 mb-3">
+      <div class="col-12 mb-3">
         <form method="GET" action="{% url 'home' %}">
-          <button type="submit" name="sort" value="distance" class="btn btn-primary">Filtrar por Distância</button>
-          <a href="{% url 'home' %}" class="btn btn-secondary">Redefinir Filtro</a>
+          <button type="submit" name="sort" value="distance" class="btn btn-custom-filtro">Filtrar por Distância</button>
+          <a href="{% url 'home' %}" class="btn btn-custom-filtro">Redefinir Filtro</a>
         </form>
       </div>
 
       {% for farmacia in farmacias %}
-      <div class="col-12 col-md-8 mb-3">
+      <div class="col-12 col-md-6 mb-3">
         <a href="/famaciaLoja/{{ farmacia.id }}" class="card card-hover">
           <div class="row no-gutters">
             <div class="col-md-4">
@@ -44,7 +43,6 @@ main page
           </div>
         </a>
       </div>
-      <br><br>
       {% endfor %}
     </div>
   </div>
