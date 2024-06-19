@@ -48,8 +48,9 @@
 
                         <div class="form-floating mb-3">
                             <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
-                                name="senha" required>
-                            <label for="floatingPassword">Senha</label>
+                                name="senha" required required minlength="8" pattern="(?=.*[A-Z]).{8,}"
+                                title="A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número e ter no mínimo 8 caracteres">
+                                <label for="floatingPassword">Senha</label>
                         </div>
                     </div>
 
@@ -81,7 +82,7 @@
 
                         <div class="form-floating mb-3">
                             <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
-                                name="senhaConfirm" required>
+                                name="senhaConfirm">
                             <label for="floatingPassword">Confirme sua senha</label>
                         </div>
 
@@ -114,7 +115,7 @@
 
 <script>
 
-        function clearAddressFields() {
+    function clearAddressFields() {
         document.getElementById('floatingLogradouro').value = '';
         document.getElementById('floatingBairro').value = '';
         document.getElementById('floatingCidade').value = '';

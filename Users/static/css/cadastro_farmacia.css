@@ -20,7 +20,7 @@ border-color: #48bbc6;
 }
 
 .btn-custom:hover {
-background-color:#48bbc6;
+background-color: #48bbc6;
 border-color: #48bbc6;
 color: white;
 }
@@ -40,4 +40,10 @@ color: #48bbc6;
 .d-grid {
 margin-top: 10px;
 margin-bottom: 30px;
+}
+
+.alert-warning {
+color: #721c24;
+background-color: #f8d7da;
+border-color: #f5c6cb;
 }

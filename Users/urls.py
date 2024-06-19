@@ -23,5 +23,9 @@ urlpatterns = [
 
     path('logout/', views.logout, name="logout"),
 
+    path('redefinirSenha/', views.redefinirSenha, name="redefinirSenha"),
+    path('email_para_redefinir_senha/', views.email_para_redefinir_senha, name="email_para_redefinir_senha"),
+
+
 
 ]

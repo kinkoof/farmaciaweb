@@ -1,3 +1,6 @@
+from hashlib import sha256
+import secrets
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.contrib import messages
 import firebase_admin
@@ -18,9 +21,6 @@ if not firebase_admin._apps:
 db = firestore.client()
 
 
-# Create your views here.
-
-# carrega o html de login
 def login(request):
     return render(request, "login.html")
 
@@ -28,19 +28,13 @@ def login(request):
 def loginFarmacia(request):
     return render(request, "login_farmacia.html")
 
-# carrega o html de cadastro
-
 
 def cadastro(request):
     return render(request, "cadastro.html")
 
-# carrega o html de cadastro de farmacias
-
 
 def cadastroFarmacia(request):
     return render(request, "cadastro_farmacia.html")
-
-# envio e verificação das informaçoes de cadastro de usuario
 
 
 def validaCadastro(request):
@@ -80,9 +74,19 @@ def validaCadastro(request):
             messages.warning(request, "Por favor, preencha todos os campos.")
             return redirect("../cadastro/")
 
+        # Verificar se o email já está cadastrado
+        users_ref = db.collection('usuario')
+        query_ref = users_ref.where('email', '==', email).stream()
+        if any(query_ref):
+            messages.warning(request, "Este email já está cadastrado.")
+            return redirect("../cadastro/")
+
         if senha != senhaConfirm:
             messages.warning(request, "As senhas não conferem.")
             return redirect("../cadastro/")
+
+        else:
+            senha = sha256(senha.encode()).hexdigest()
 
         # Cria o dicionário de dados a ser enviado para o Firestore
         user_data = {
@@ -105,8 +109,6 @@ def validaCadastro(request):
 
         return redirect("../login/")
     return render(request, 'cadastro.html')
-
-# envio e verificação das informaçoes de cadastro de farmacias
 
 
 def validaCadastroFarmacia(request):
@@ -153,9 +155,19 @@ def validaCadastroFarmacia(request):
             messages.warning(request, "Por favor, preencha todos os campos.")
             return redirect("../cadastroFarmacia/")
 
+        farmacias_ref = db.collection('farmacias')
+        query_ref = farmacias_ref.where(
+            'email', '==', emailResponsavel).stream()
+        if any(query_ref):
+            messages.warning(request, "Este email já está cadastrado.")
+            return redirect("../cadastroFarmacia/")
+
         if senha != senhaConfirm:
             messages.warning(request, "As senhas não conferem.")
             return redirect("../cadastroFarmacia/")
+
+        else:
+            senha = sha256(senha.encode()).hexdigest()
 
         data = {
             "email": emailResponsavel,
@@ -198,11 +210,11 @@ def validaCadastroFarmacia(request):
                 # Add the image URL to the data
                 data["imagem_perfil"] = imagem_url
             except Exception as e:
-                messages.warning(request, f"Erro ao fazer upload da imagem: {e}")
+                messages.warning(
+                    request, f"Erro ao fazer upload da imagem: {e}")
                 return redirect("../cadastroFarmacia/")
 
         try:
-            db = firestore.client()  # Initialize Firestore client
             doc_ref = db.collection('farmacias').document()
             doc_ref.set(data)
 
@@ -214,13 +226,12 @@ def validaCadastroFarmacia(request):
     else:
         return redirect("../cadastroFarmacia/")
 
-# verificacao da requisicao de login
-
 
 def validaLogin(request):
     if request.method == "POST":
         email = request.POST.get("email")
         senha = request.POST.get("senha")
+        senha = sha256(senha.encode()).hexdigest()
 
         if not email or not senha:
             messages.warning(request, "Por favor, preencha todos os campos.")
@@ -286,8 +297,6 @@ def validaLoginFarmacia(request):
             return redirect("../loginFarmacia/")
     else:
         return redirect("../loginFarmacia/")
-
-# logout
 
 
 def logout(request):
@@ -452,8 +461,47 @@ def editarUsuario(request):
             messages.success(request, "Dados atualizados com sucesso.")
             return redirect("/auth/perfil/")
         except Exception as e:
-            messages.warning(request, f"Erro ao tentar atualizar os dados: {e}")
+            messages.warning(
+                request, f"Erro ao tentar atualizar os dados: {e}")
             print(id)
             return redirect("/auth/perfil/")
     else:
         return render(request, 'editar_usuario.html', {'user_info': user_info})
+
+
+def redefinirSenha(request):
+    return render(request, "redefinirSenha.html")
+
+
+def email_para_redefinir_senha(request):
+
+    email = request.POST.get("email")
+    users_ref = db.collection('usuario')
+    query_ref = users_ref.where('email', '==', email).stream()
+
+    if not(query_ref):
+            messages.warning(request, "Este email não está cadastrado.")
+            return redirect("../cadastro/")
+
+    if user.reset_password_token:
+        return HttpResponse("Link de redefinição de senha já utilizado ou expirado.")
+
+    # Gerar um token exclusivo
+    reset_token = secrets.token_urlsafe(16)
+
+    # Salvar o token no usuário
+    user.reset_password_token = reset_token
+    user.save()
+
+    reset_link = f"http://127.0.0.1:8000/auth/reset_password_template/{user.id}/{reset_token}"
+
+    send_mail(
+        "Password change",
+        f"Para redefinir sua senha, clique no link a seguir: {reset_link}",
+        "myasthenia.email@gmail.com",
+        [resetemail],
+        fail_silently=False,
+    )
+
+    # Redirecione para a página de login após o envio do e-mail
+    return redirect("../login")

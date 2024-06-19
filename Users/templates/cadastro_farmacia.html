@@ -25,7 +25,7 @@
                     <input class="form-control" type="file" id="formFile" name="imagem">
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="floatingInput" name="emailResponsavel">
+                    <input type="text" class="form-control" id="floatingInput" name="emailResponsavel" required>
                     <label for="floatingInput">email do responsável</label>
                 </div>
                 <div class="row">
@@ -33,78 +33,81 @@
 
 
                         <div class="form-floating mb-3">
-                            <input type="number" class="form-control" id="floatingCep" placeholder="Cep" name="cep">
+                            <input type="number" class="form-control" id="floatingCep" placeholder="Cep" name="cep"
+                                required>
                             <label for="floatingInput">Cep</label>
                         </div>
 
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="floatingEstado" placeholder="Estado"
-                                name="estado" readonly>
+                                name="estado" readonly required>
                             <label for="floatingInput">Estado</label>
                         </div>
 
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="floatingCidade" placeholder="Cidade"
-                                name="cidade" readonly>
+                                name="cidade" readonly required>
                             <label for="floatingInput">Cidade</label>
                         </div>
 
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="floatingBairro" placeholder="Bairro"
-                                name="bairro" readonly>
+                                name="bairro" readonly required>
                             <label for="floatingInput">Bairro</label>
                         </div>
 
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="floatingLogradouro" placeholder="Logradouro"
-                                name="logradouro" readonly>
+                                name="logradouro" readonly required>
                             <label for="floatingInput">Logradouro</label>
                         </div>
 
                         <div class="form-floating mb-3">
                             <input type="number" class="form-control" id="floatingNumero" placeholder="Numero"
-                                name="numero">
+                                name="numero" required>
                             <label for="floatingInput">Numero</label>
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" id="floatingPassword" name="senha">
+                            <input type="password" class="form-control" id="floatingPassword" name="senha" required
+                                minlength="8" pattern="(?=.*[A-Z]).{8,}"
+                                title="The password must contain at least one uppercase letter and be at least 8 characters long">
                             <label for="floatingPassword">Senha</label>
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="floatingInput" name="nomeResponsavel">
+                            <input type="text" class="form-control" id="floatingInput" name="nomeResponsavel" required>
                             <label for="floatingInput">Nome do responsável</label>
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="floatingInput" name="cpf">
+                            <input type="text" class="form-control" id="floatingInput" name="cpf" required>
                             <label for="floatingInput">CPF</label>
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input type="number" class="form-control" id="floatingInput" name="celular">
+                            <input type="number" class="form-control" id="floatingInput" name="celular" required>
                             <label for="floatingInput">Celular</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="floatingInput" name="nomeFantasia">
+                            <input type="text" class="form-control" id="floatingInput" name="nomeFantasia" required>
                             <label for="floatingInput">Nome fantasia</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="number" class="form-control" id="floatingInput" name="contaBancaria">
+                            <input type="number" class="form-control" id="floatingInput" name="contaBancaria" required>
                             <label for="floatingInput">Conta bancária</label>
 
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input type="number" class="form-control" id="floatingInput" name="cnpj">
+                            <input type="number" class="form-control" id="floatingInput" name="cnpj" required>
                             <label for="floatingInput">CNPJ</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" id="floatingPasswordConfirm"
-                                name="senhaConfirm">
+                            <input type="password" class="form-control" id="floatingPasswordConfirm" name="senhaConfirm"
+                                required>
                             <label for="floatingPasswordConfirm">Confirme sua senha</label>
                         </div>
                     </div>
@@ -120,7 +123,8 @@
                 </div>
                 <br>
                 <div class="d-grid gap-2">
-                    <input type="submit" class="btn mx-auto btn-custom fs-5" type="button" value="Registre-se" id="botaologin">
+                    <input type="submit" class="btn mx-auto btn-custom fs-5" type="button" value="Registre-se"
+                        id="botaologin">
                 </div>
             </form>
             {% if messages %}
@@ -132,5 +136,47 @@
         </div>
     </div>
 </div>
+<script>
+
+    function clearAddressFields() {
+        document.getElementById('floatingLogradouro').value = '';
+        document.getElementById('floatingBairro').value = '';
+        document.getElementById('floatingCidade').value = '';
+        document.getElementById('floatingEstado').value = '';
+    }
+
+    document.getElementById('floatingCep').addEventListener('input', function () {
+        let cep = this.value.replace(/\D/g, '');
+        if (cep.length === 8) {
+            let validacep = /^[0-9]{8}$/;
+            if (validacep.test(cep)) {
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!("erro" in data)) {
+                            document.getElementById('floatingLogradouro').value = data.logradouro;
+                            document.getElementById('floatingBairro').value = data.bairro;
+                            document.getElementById('floatingCidade').value = data.localidade;
+                            document.getElementById('floatingEstado').value = data.uf;
+                        } else {
+                            clearAddressFields();
+                            alert("CEP não encontrado.");
+                        }
+                    })
+                    .catch(error => {
+                        clearAddressFields();
+                        console.error('Error fetching CEP:', error);
+                    });
+            } else {
+                clearAddressFields();
+                alert("Formato de CEP inválido.");
+            }
+        } else {
+            clearAddressFields();
+        }
+    });
+
+
+</script>
 
 {% endblock body %}
