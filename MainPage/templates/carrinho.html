@@ -20,6 +20,11 @@
         </div>
         {% endfor %}
     </div>
-    <a href="{% url 'finalizar_pedido' %}" class="btn btn-success mt-3">Finalizar Pedido</a>
+    <a href="{% url 'finalizarPedido' %}" class="btn btn-success mt-3">Finalizar Pedido</a>
 </div>
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }}">{{ message }}</div>
+{% endfor %}
+{% endif %}
 {% endblock %}

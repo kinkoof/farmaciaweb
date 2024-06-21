@@ -82,48 +82,9 @@ def farmaciaLoja(request, farmacia_id):
 
     itens_ref = db.collection('itens').where(
         'farmacia_id', '==', farmacia_id).stream()
-    itens = [item.to_dict() for item in itens_ref]
-    user_id = request.session.get('user_id')
-    if not user_id:
-        messages.error(request, "Você precisa estar logado para adicionar itens ao carrinho.")
-        return redirect('login')
+    itens = [{'id': item.id, **item.to_dict()} for item in itens_ref]
 
-    item_doc = db.collection('itens').document(item_id).get()
-    if not item_doc.exists:
-        messages.error(request, "Item não encontrado.")
-        return redirect('home')
-
-    item_data = item_doc.to_dict()
-    farmacia_id = item_data['farmacia_id']
-
-    carrinho_ref = db.collection('usuarios').document(user_id).collection('carrinho')
-
-    # Verifica se o carrinho já tem itens de uma farmácia diferente
-    carrinho_itens = carrinho_ref.stream()
-    if carrinho_itens:
-        for item in carrinho_itens:
-            carrinho_item = item.to_dict()
-            if carrinho_item['farmacia_id'] != farmacia_id:
-                messages.error(request, "Você só pode adicionar itens de uma única farmácia ao carrinho.")
-                return redirect('farmacia_loja', farmacia_id=farmacia_id)
-
-    # Adiciona o item ao carrinho ou atualiza a quantidade
-    carrinho_item_ref = carrinho_ref.document(item_id)
-    carrinho_item = carrinho_item_ref.get()
-    if carrinho_item.exists:
-        carrinho_item_ref.update({'quantidade': carrinho_item.to_dict()['quantidade'] + 1})
-    else:
-        carrinho_item_ref.set({
-            'item_id': item_id,
-            'nome': item_data['nome'],
-            'preco': item_data['preco'],
-            'quantidade': 1,
-            'imagem_url': item_data.get('imagem_url', ''),
-            'farmacia_id': farmacia_id
-        })
-
-    messages.success(request, "Item adicionado ao carrinho.")
-    return redirect('farmacia_loja', farmacia_id=farmacia_id)
+    return render(request, 'famaciaLoja.html', {'farmacia': farmacia, 'itens': itens})
 
 
 def search(request: HttpRequest):
@@ -175,14 +136,83 @@ def search(request: HttpRequest):
 
     return render(request, 'search.html', context)
 
+
 def view_carrinho(request):
     user_id = request.session.get('user_id')
-    if not user_id:
-        messages.error(request, "Você precisa estar logado para visualizar o carrinho.")
-        return redirect('login')
 
-    carrinho_ref = db.collection('usuarios').document(user_id).collection('carrinho')
+    carrinho_ref = db.collection('usuario').document(
+        user_id).collection('carrinho')
     carrinho_itens = carrinho_ref.stream()
     itens = [item.to_dict() for item in carrinho_itens]
 
     return render(request, 'carrinho.html', {'itens': itens})
+
+
+def adicionarAoCarrinho(request, item_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        messages.error(
+            request, "Você precisa estar logado para adicionar itens ao carrinho.")
+        return redirect('login')
+
+    item_doc = db.collection('itens').document(item_id).get()
+    if not item_doc.exists:
+        messages.error(request, "Item não encontrado.")
+        return redirect('home')
+
+    item_data = item_doc.to_dict()
+    farmacia_id = item_data['farmacia_id']
+
+    carrinho_ref = db.collection('usuario').document(
+        user_id).collection('carrinho')
+
+    # Verifica se o carrinho já tem itens de uma farmácia diferente
+    carrinho_itens = carrinho_ref.stream()
+    if carrinho_itens:
+        for carrinho_item in carrinho_itens:
+            if carrinho_item.to_dict()['farmacia_id'] != farmacia_id:
+                messages.error(
+                    request, "Você só pode adicionar itens de uma única farmácia ao carrinho.")
+                return redirect('farmaciaLoja', farmacia_id=farmacia_id)
+
+    # Adiciona o item ao carrinho ou atualiza a quantidade
+    carrinho_item_ref = carrinho_ref.document(item_id)
+    carrinho_item = carrinho_item_ref.get()
+    if carrinho_item.exists:
+        carrinho_item_ref.update(
+            {'quantidade': carrinho_item.to_dict()['quantidade'] + 1})
+    else:
+        carrinho_item_ref.set({
+            'item_id': item_id,
+            'nome': item_data['nome'],
+            'preco': item_data['preco'],
+            'quantidade': 1,
+            'imagem_url': item_data.get('imagem_url', ''),
+            'farmacia_id': farmacia_id
+        })
+
+    messages.success(request, "Item adicionado ao carrinho.")
+    return redirect('farmaciaLoja', farmacia_id=farmacia_id)
+
+
+def finalizarPedido(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        # Redirecionar para a página de login se o usuário não estiver logado
+        return redirect('login')
+
+    # Referência para a subcoleção 'carrinho' do usuário
+    carrinho_ref = db.collection('usuario').document(
+        user_id).collection('carrinho')
+
+    # Excluir todos os documentos da subcoleção 'carrinho'
+    carrinho_docs = carrinho_ref.stream()
+    for doc in carrinho_docs:
+        doc.reference.delete()
+
+    # Mensagem de sucesso (opcional)
+    messages.success(request, "Pedido finalizado com sucesso. Carrinho limpo.")
+
+    # Redirecionar para uma página de confirmação ou outra página relevante
+    # Substitua 'pagina_de_confirmacao' pela sua URL desejada
+    return redirect('view_carrinho')
