@@ -33,7 +33,7 @@
 
 
                         <div class="form-floating mb-3">
-                            <input type="number" class="form-control" id="floatingCep" placeholder="Cep" name="cep"
+                            <input type="text" class="form-control" id="floatingCep" placeholder="Cep" name="cep"
                                 required>
                             <label for="floatingInput">Cep</label>
                         </div>
@@ -71,7 +71,7 @@
                         <div class="form-floating mb-3">
                             <input type="password" class="form-control" id="floatingPassword" name="senha" required
                                 minlength="8" pattern="(?=.*[A-Z]).{8,}"
-                                title="The password must contain at least one uppercase letter and be at least 8 characters long">
+                                title="A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número e ter no mínimo 8 caracteres">
                             <label for="floatingPassword">Senha</label>
                         </div>
                     </div>
@@ -83,12 +83,12 @@
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="floatingInput" name="cpf" required>
+                            <input type="text" class="form-control" id="floatingCpf" name="cpf" required>
                             <label for="floatingInput">CPF</label>
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input type="number" class="form-control" id="floatingInput" name="celular" required>
+                            <input type="text" class="form-control" id="floatingCelular" name="celular" required>
                             <label for="floatingInput">Celular</label>
                         </div>
                         <div class="form-floating mb-3">
@@ -96,13 +96,13 @@
                             <label for="floatingInput">Nome fantasia</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="number" class="form-control" id="floatingInput" name="contaBancaria" required>
+                            <input type="text" class="form-control" id="floatingContaBancaria" name="contaBancaria"
+                                required>
                             <label for="floatingInput">Conta bancária</label>
-
                         </div>
 
                         <div class="form-floating mb-3">
-                            <input type="number" class="form-control" id="floatingInput" name="cnpj" required>
+                            <input type="text" class="form-control" id="floatingCnpj" name="cnpj" required>
                             <label for="floatingInput">CNPJ</label>
                         </div>
                         <div class="form-floating mb-3">
@@ -137,6 +137,55 @@
     </div>
 </div>
 <script>
+
+    document.getElementById('floatingCnpj').addEventListener('input', function () {
+        let cnpj = this.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+        if (cnpj.length > 0) {
+            // Formatando de acordo com o padrão de CNPJ (xx.xxx.xxx/xxxx-xx)
+            cnpj = cnpj.substring(0, 2) + '.' + cnpj.substring(2, 5) + '.' + cnpj.substring(5, 8) + '/' +
+                cnpj.substring(8, 12) + '-' + cnpj.substring(12, 14);
+        }
+        this.value = cnpj;
+    });
+
+    document.getElementById('floatingContaBancaria').addEventListener('input', function () {
+        let conta = this.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+        if (conta.length > 0) {
+            // Formatando de acordo com o padrão de conta bancária (agência + conta)
+            if (conta.length <= 7) {
+                conta = conta.substring(0, 3) + '-' + conta.substring(3, 7);
+            } else {
+                conta = conta.substring(0, 3) + '-' + conta.substring(3, 8);
+            }
+        }
+        this.value = conta;
+    });
+
+    document.getElementById('floatingCpf').addEventListener('input', function () {
+        let cpf = this.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+        if (cpf.length > 0) {
+            cpf = cpf.substring(0, 3) + '.' + cpf.substring(3, 6) + '.' + cpf.substring(6, 9) + '-' + cpf.substring(9, 11);
+        }
+        this.value = cpf;
+    });
+
+    document.getElementById('floatingCep').addEventListener('input', function () {
+        let cep = this.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+        if (cep.length > 0) {
+            cep = cep.substring(0, 5) + '-' + cep.substring(5, 8);
+        }
+        this.value = cep;
+    });
+
+    document.getElementById('floatingCelular').addEventListener('input', function () {
+        let celular = this.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+        if (celular.length === 11) { // Formato para celular com DDD
+            celular = '(' + celular.substring(0, 2) + ') ' + celular.substring(2, 7) + '-' + celular.substring(7, 11);
+        } else if (celular.length === 10) { // Formato para celular sem DDD
+            celular = '(' + celular.substring(0, 2) + ') ' + celular.substring(2, 6) + '-' + celular.substring(6, 10);
+        }
+        this.value = celular;
+    });
 
     function clearAddressFields() {
         document.getElementById('floatingLogradouro').value = '';

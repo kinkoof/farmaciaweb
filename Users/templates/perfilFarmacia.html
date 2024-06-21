@@ -34,9 +34,10 @@
             <p class="card-text"><strong>CPF:</strong> {{ user_info.cpf }}</p>
             <p class="card-text"><strong>Endereço:</strong> {{ user_info.endereco }}</p>
             <p class="card-text"><strong>Nome:</strong> {{ user_info.nome }}</p>
-            <p class="card-text"><strong>Senha:</strong> {{ user_info.senha }}</p>
 
             <a href="{% url 'loja' %}" class="btn btn-danger mt-3">Adicionar item</a>
+            <a href="{% url 'editar_farmacia' %}" class="btn btn-danger mt-3">Editar dados</a>
+
         </div>
     </div>
 </div>

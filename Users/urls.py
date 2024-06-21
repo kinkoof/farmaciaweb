@@ -5,6 +5,7 @@ urlpatterns = [
     path('perfil/', views.perfil, name="perfil"),
     path('editarUsuario/', views.editarUsuario, name="editar_usuario"),
     path('perfilFarmacia/', views.perfilFarmacia, name="perfilFarmacia"),
+    path('editarFarmacia/', views.editarFarmacia, name="editar_farmacia"),
 
     path('loja/', views.loja, name="loja"),
     path('adcionarItem/', views.adicionarItem, name="adicionarItem"),
@@ -23,8 +24,9 @@ urlpatterns = [
 
     path('logout/', views.logout, name="logout"),
 
-    path('redefinirSenha/', views.redefinirSenha, name="redefinirSenha"),
+    path('redefinirSenha/', views.view_redefinir_senha, name="redefinirSenha"),
     path('email_para_redefinir_senha/', views.email_para_redefinir_senha, name="email_para_redefinir_senha"),
+    path('alterarsenha/<str:id>/<str:reset_token>/', views.redefinir_senha, name="redefinir_senha"),
 
 
 

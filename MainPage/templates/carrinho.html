@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1 class="text-center">Carrinho de Compras</h1>
+    <div class="row">
+        {% for item in itens %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="img-container">
+                    <img src="{{ item.imagem_url }}" class="card-img-top" alt="{{ item.nome }}">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.nome }}</h5>
+                    <p class="card-text">Preço: R$ {{ item.preco }}</p>
+                    <p class="card-text">Quantidade: {{ item.quantidade }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <a href="{% url 'finalizar_pedido' %}" class="btn btn-success mt-3">Finalizar Pedido</a>
+</div>
+{% endblock %}

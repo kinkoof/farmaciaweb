@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock head %}
+
+
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center align-items-center">
+        <div class="col-md-6">
+            <img src="{% static 'img/logo.png' %}" class="img-fluid" alt="">
+        </div>
+        <div class="col-md-6">
+            <h1 class="text-center" style="font-weight:900;">Redefina sua Senha</h1>
+            <p class="text-center">Preencha os campos abaixo</p>
+            <form action="#" method="POST" class="mt-5">
+                {% csrf_token %}
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
+                        name="nova_senha" required required minlength="8" pattern="(?=.*[A-Z]).{8,}"
+                        title="A senha deve conter pelo menos uma letra maiúscula, uma letra minúscula, um número e ter no mínimo 8 caracteres">
+                        <label for="floatingPassword">Senha</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
+                        name="senhaConfirm">
+                    <label for="floatingPassword">Confirme sua senha</label>
+                </div>
+                <div class="row">
+                    <div class="col text-start">
+                        <a href="{% url 'login' %}" class="hover-a">Entrar na sua conta</a>
+                    </div>
+                    <div class="col text-end">
+                        <a href="{% url 'cadastro' %}" class="hover-a">Não tem conta? Clique aqui</a>
+                    </div>
+                </div>
+                <br>
+
+                <div class="d-grid gap-2">
+                    <input type="submit" class="btn mx-auto btn-custom fs-5" type="button" value="Alterar senha" id="botaologin">
+                </div>
+            </form>
+            <br>
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alerta">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+{% endblock body %}

@@ -4,11 +4,11 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.contrib import messages
 import firebase_admin
-from firebase_admin import credentials, storage, firestore, auth, exceptions
+from firebase_admin import credentials, storage, firestore
+from django.core.mail import send_mail
 from google.cloud import storage
 import os
 import requests
-
 
 # Define a variável de ambiente GOOGLE_APPLICATION_CREDENTIALS
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "cred.json"
@@ -268,6 +268,7 @@ def validaLoginFarmacia(request):
     if request.method == "POST":
         email = request.POST.get("email")
         senha = request.POST.get("senha")
+        senha = sha256(senha.encode()).hexdigest()
 
         if not email or not senha:
             messages.warning(request, "Por favor, preencha todos os campos.")
@@ -469,39 +470,145 @@ def editarUsuario(request):
         return render(request, 'editar_usuario.html', {'user_info': user_info})
 
 
-def redefinirSenha(request):
+def editarFarmacia(request):
+    user_info = request.session.get('user_info')
+    user_type = request.session.get('user_type')
+    id = request.session.get('farmacia_id')
+    print(id)
+
+    if not user_info or user_type != 'farmacia':
+        messages.warning(
+            request, "Você precisa estar logado para acessar esta página.")
+        return redirect("../login/")
+
+    if request.method == "POST":
+        # Obter dados do formulário
+        novo_email = request.POST.get("email")
+        novo_nome = request.POST.get("nome")
+        novo_nomeFantasia = request.POST.get("nomeFantasia")
+        nova_senha = request.POST.get("senha")
+        novo_cep = request.POST.get("cep")
+        novo_estado = request.POST.get("estado")
+        nova_cidade = request.POST.get("cidade")
+        novo_logradouro = request.POST.get("logradouro")
+        novo_numero = request.POST.get("numero")
+
+        # Atualizar os dados do usuário no banco de dados
+        try:
+            db.collection('farmacias').document(id).update({
+                'email': novo_email,
+                'nome': novo_nome,
+                'senha': nova_senha,
+                'cep': novo_cep,
+                'estado': novo_estado,
+                'cidade': nova_cidade,
+                'logradouro': novo_logradouro,
+                'numero': novo_numero,
+            })
+
+            # Atualizar os dados da sessão
+            user_info['email'] = novo_email
+            user_info['nome'] = novo_nome
+            user_info['senha'] = nova_senha
+            user_info['cep'] = novo_cep
+            user_info['estado'] = novo_estado
+            user_info['cidade'] = nova_cidade
+            user_info['logradouro'] = novo_logradouro
+            user_info['numero'] = novo_numero
+            request.session['user_info'] = user_info
+
+            messages.success(request, "Dados atualizados com sucesso.")
+            return redirect("/auth/perfilFarmacia/")
+        except Exception as e:
+            messages.warning(
+                request, f"Erro ao tentar atualizar os dados: {e}")
+            print(id)
+            return redirect("/auth/perfilFarmacia/")
+    else:
+        return render(request, 'editar_farmacia.html', {'user_info': user_info})
+
+
+def view_redefinir_senha(request):
     return render(request, "redefinirSenha.html")
 
 
 def email_para_redefinir_senha(request):
+    resetemail = request.POST.get("email")
+    if not resetemail:
+        messages.warning(request, "Por favor, forneça um email.")
+        return redirect("../cadastro/")
 
-    email = request.POST.get("email")
     users_ref = db.collection('usuario')
-    query_ref = users_ref.where('email', '==', email).stream()
+    query_ref = users_ref.where('email', '==', resetemail).stream()
 
-    if not(query_ref):
-            messages.warning(request, "Este email não está cadastrado.")
-            return redirect("../cadastro/")
+    user_id = None
+    for user in query_ref:
+        user_id = user.id
+        break
 
-    if user.reset_password_token:
-        return HttpResponse("Link de redefinição de senha já utilizado ou expirado.")
+    if not user_id:
+        messages.warning(request, "Este email não está cadastrado.")
+        return redirect("../cadastro/")
 
-    # Gerar um token exclusivo
     reset_token = secrets.token_urlsafe(16)
 
-    # Salvar o token no usuário
-    user.reset_password_token = reset_token
-    user.save()
+    try:
+        token_data = {
+            'reset_token': reset_token,
+            'created_at': firestore.SERVER_TIMESTAMP
+        }
+        db.collection('usuario').document(user_id).collection(
+            'password_resets').add(token_data)
 
-    reset_link = f"http://127.0.0.1:8000/auth/reset_password_template/{user.id}/{reset_token}"
+        reset_link = f"http://127.0.0.1:8000/auth/alterarsenha/{user_id}/{reset_token}"
 
-    send_mail(
-        "Password change",
-        f"Para redefinir sua senha, clique no link a seguir: {reset_link}",
-        "myasthenia.email@gmail.com",
-        [resetemail],
-        fail_silently=False,
-    )
+        send_mail(
+            "Password change",
+            f"Para redefinir sua senha, clique no link a seguir: {reset_link}",
+            "myasthenia.email@gmail.com",
+            [resetemail],
+            fail_silently=False,
+        )
 
-    # Redirecione para a página de login após o envio do e-mail
-    return redirect("../login")
+        return redirect("../login")
+    except Exception as e:
+        messages.error(
+            request, "Ocorreu um erro ao tentar enviar o email. Por favor, tente novamente.")
+        return redirect("../cadastro/")
+
+
+def redefinir_senha(request, id, reset_token):
+    # Validate the reset token
+    token_ref = db.collection('usuario').document(id).collection(
+        'password_resets').where('reset_token', '==', reset_token).stream()
+    valid_token = None
+
+    for token in token_ref:
+        valid_token = token
+
+    if not valid_token:
+        messages.error(request, "Token inválido ou expirado.")
+        return redirect("../login")
+
+    if request.method == "POST":
+        new_password = request.POST.get("nova_senha")
+        new_password_confirm = request.POST.get("senhaConfirm")
+
+        if new_password != new_password_confirm:
+            messages.warning(request, "As senhas não conferem.")
+            return render(request, 'alterarsenha.html', {'user_id': id, 'reset_token': reset_token})
+
+        # Hash the new password (example using SHA-256)
+        new_password_hashed = sha256(new_password.encode()).hexdigest()
+
+        # Update the user's password in your authentication system
+        db.collection('usuario').document(id).update(
+            {'senha': new_password_hashed})
+
+        # Delete the token after successful password reset
+        valid_token.reference.delete()
+
+        messages.success(request, "Senha alterada com sucesso.")
+        return redirect("../../../login")
+
+    return render(request, 'alterarsenha.html', {'user_id': id, 'reset_token': reset_token})

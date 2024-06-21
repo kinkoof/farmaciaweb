@@ -25,7 +25,7 @@
                 </div>
 
                 <div class="form-floating mb-3">
-                    <input type="number" class="form-control" id="preco_item" name="preco_item">
+                    <input type="text" class="form-control" id="preco_item" name="preco_item" pattern="[0-9]+([\.|,][0-9]+)?">
                     <label for="preco_item">Preço</label>
                 </div>
 
@@ -35,7 +35,8 @@
                 </div>
                 <br>
                 <div class="d-grid gap-2">
-                    <input type="submit" class="btn btn-custom mx-auto" type="button" value="Adicionar item" id="botaologin">
+                    <input type="submit" class="btn btn-custom mx-auto" type="button" value="Adicionar item"
+                        id="botaologin">
                 </div>
             </form>
 
@@ -48,24 +49,22 @@
 {% endfor %}
 {% endif %}
 
-    <div class="container mt-4">
-        <div class="row">
-                {% for item in itens %}
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100">
-                        <img src="{{ item.imagem_url }}" class="card-img-top" alt="{{ item.nome }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ item.nome }}</h5>
-                            <p class="card-text">Preço: R$ {{ item.preco }}</p>
-                            <p class="card-text">{{ item.descricao }}</p>
+<div class="container mt-4">
+    <div class="row">
+        {% for item in itens %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100">
+                <img src="{{ item.imagem_url }}" class="card-img-top" alt="{{ item.nome }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.nome }}</h5>
+                    <p class="card-text">Preço: R$ {{ item.preco }}</p>
+                    <p class="card-text">{{ item.descricao }}</p>
 
-                        </div>
-                    </div>
                 </div>
-                {% endfor %}
+            </div>
         </div>
+        {% endfor %}
     </div>
+</div>
 
-
-
-        {% endblock body %}
+{% endblock body %}
