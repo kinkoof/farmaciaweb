@@ -6,12 +6,22 @@
 <link rel="stylesheet" href="{% static 'css/farmaciaLoja.css' %}">
 {% endblock head %}
 
+
 {% block body %}
+<style>
+    .profile-card img {
+        width: 150px;
+        /* Tamanho da imagem */
+        height: 150px;
+        /* Tamanho da imagem */
+        object-fit: cover;
+        /* Ajusta a imagem para cobrir o espaço sem distorção */
+    }
+</style>
 <div class="container mt-4">
     <div class="card profile-card">
-
         <div class="card-header d-flex justify-content-center">
-            <img src="{{ farmacia.imagem_perfil }}" alt="Foto de perfil" class="img-fluid rounded mx-auto d-block">
+            <img src="{{ farmacia.imagem_perfil }}" alt="Foto de perfil" class="img-fluid rounded mx-auto d-block rounded-circle">
         </div>
         <div class="card-body">
             <p class="card-text"><strong>Nome Fantasia:</strong>{{ farmacia.nomeFantasia }}</p>
@@ -24,19 +34,19 @@
 <div class="container mt-4">
     <div class="row">
         {% for item in itens %}
-        <div class="col-lg-4 col-md-6 mb-4">
+        <div class="col-lg-3 col-md-6 mb-4">
             <div class="card h-100">
                 <div class="img-container">
-                    <img src="{{ item.imagem_url }}" class="card-img-top" alt="{{ item.nome }}">
+                    <img src="{{ item.imagem_url }}" class="card-img-top mt-2" alt="{{ item.nome }}">
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ item.nome }}</h5>
                     <p class="card-text">Preço: R$ {{ item.preco }}</p>
                     <p class="card-text">{{ item.descricao }}</p>
                 </div>
-                <form action="{% url 'adicionar_ao_carrinho' item.id %}" method="POST">
+                <form action="{% url 'adicionar_ao_carrinho' item.id %}" method="POST" class="text-center">
                     {% csrf_token %}
-                    <button class="btn btn-custom-base" type="submit">
+                    <button class="btn btn-custom-base mb-2" type="submit">
                         <svg xmlns="http://www.w3.org/2000/svg" width="60" height="30" fill="currentColor"
                             class="bi bi-cart-fill" viewBox="0 0 16 16">
                             <path

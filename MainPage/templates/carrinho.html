@@ -1,12 +1,18 @@
 {% extends 'base.html' %}
 {% load static %}
 
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock head %}
+
 {% block body %}
 <div class="container mt-4">
     <h1 class="text-center">Carrinho de Compras</h1>
+    <h2 class="text-center">VALOR TOTAL: R$ {{ total }}</h2>
     <div class="row">
         {% for item in itens %}
-        <div class="col-lg-4 col-md-6 mb-4">
+        <div class="col-lg-3 col-md-6 mb-4">
             <div class="card h-100">
                 <div class="img-container">
                     <img src="{{ item.imagem_url }}" class="card-img-top" alt="{{ item.nome }}">
@@ -16,11 +22,12 @@
                     <p class="card-text">Preço: R$ {{ item.preco }}</p>
                     <p class="card-text">Quantidade: {{ item.quantidade }}</p>
                 </div>
+                <a href="{% url 'remover_do_carrinho' item.id %}" class="btn btn-custom-base mt-2 mb-2 ms-4 me-4">Cancelar</a>
             </div>
         </div>
         {% endfor %}
     </div>
-    <a href="{% url 'finalizarPedido' %}" class="btn btn-success mt-3">Finalizar Pedido</a>
+    <a href="{% url 'finalizarPedido' %}" class="btn btn-custom-base mb-3">Finalizar Pedido</a>
 </div>
 {% if messages %}
 {% for message in messages %}

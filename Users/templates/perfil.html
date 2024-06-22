@@ -33,8 +33,6 @@
             <p class="card-text"><strong>cidade:</strong> {{ user_info.cidade }}</p>
             <p class="card-text"><strong>bairro:</strong> {{ user_info.bairro }}</p>
             <p class="card-text"><strong>numero:</strong> {{ user_info.numero }}</p>
-            <p class="card-text"><strong>Senha:</strong> {{ user_info.senha }}</p>
-            <a href="{% url 'logout' %}" class="btn btn-danger mt-3">Logout</a>
             <a href="{% url 'editar_usuario' %}" class="btn btn-danger mt-3">Editar Perfil</a>
         </div>
     </div>

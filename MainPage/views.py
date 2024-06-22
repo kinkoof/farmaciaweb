@@ -84,11 +84,10 @@ def farmaciaLoja(request, farmacia_id):
         'farmacia_id', '==', farmacia_id).stream()
     itens = [{'id': item.id, **item.to_dict()} for item in itens_ref]
 
-    return render(request, 'famaciaLoja.html', {'farmacia': farmacia, 'itens': itens})
+    return render(request, 'farmaciaLoja.html', {'farmacia': farmacia, 'itens': itens})
 
 
 def search(request: HttpRequest):
-
     query = request.GET.get('query')
     user_id = request.session.get('user_id')
     user_lat, user_lon = None, None
@@ -110,10 +109,10 @@ def search(request: HttpRequest):
 
     for item in todos_itens:
         item_data = item.to_dict()
+        item_data['id'] = item.id  # Adiciona o ID do documento
         if query.lower() in item_data.get('nome', '').lower():
             farmacia_id = item_data['farmacia_id']
-            farmacia_doc = db.collection(
-                'farmacias').document(farmacia_id).get()
+            farmacia_doc = db.collection('farmacias').document(farmacia_id).get()
             if farmacia_doc.exists:
                 farmacia_data = farmacia_doc.to_dict()
                 farmacia_data['id'] = farmacia_id
@@ -122,8 +121,7 @@ def search(request: HttpRequest):
                 if user_lat is not None and user_lon is not None and 'latitude' in farmacia_data and 'longitude' in farmacia_data:
                     farmacia_lat = farmacia_data['latitude']
                     farmacia_lon = farmacia_data['longitude']
-                    distancia = haversine(float(user_lat), float(
-                        user_lon), farmacia_lat, farmacia_lon)
+                    distancia = haversine(float(user_lat), float(user_lon), farmacia_lat, farmacia_lon)
                     farmacia_data['distancia'] = distancia
 
                 item_data['farmacia'] = farmacia_data
@@ -139,13 +137,26 @@ def search(request: HttpRequest):
 
 def view_carrinho(request):
     user_id = request.session.get('user_id')
+    if not user_id:
+        messages.error(request, "Você precisa estar logado para visualizar o carrinho.")
+        return redirect('login')
 
-    carrinho_ref = db.collection('usuario').document(
-        user_id).collection('carrinho')
+    carrinho_ref = db.collection('usuario').document(user_id).collection('carrinho')
     carrinho_itens = carrinho_ref.stream()
-    itens = [item.to_dict() for item in carrinho_itens]
+    itens = [{'id': item.id, **item.to_dict()} for item in carrinho_itens]
 
-    return render(request, 'carrinho.html', {'itens': itens})
+    # Função para converter preço com vírgula para float
+    def convert_price(price_str):
+        try:
+            # Substitui a vírgula por ponto e converte para float
+            return float(price_str.replace(',', '.'))
+        except ValueError:
+            return 0.0
+
+    # Calcula o valor total
+    total = sum(convert_price(item['preco']) * int(item['quantidade']) for item in itens)
+
+    return render(request, 'carrinho.html', {'itens': itens, 'total': total})
 
 
 def adicionarAoCarrinho(request, item_id):
@@ -157,7 +168,7 @@ def adicionarAoCarrinho(request, item_id):
 
     item_doc = db.collection('itens').document(item_id).get()
     if not item_doc.exists:
-        messages.error(request, "Item não encontrado.")
+        messages.warning(request, "Item não encontrado.")
         return redirect('home')
 
     item_data = item_doc.to_dict()
@@ -171,7 +182,7 @@ def adicionarAoCarrinho(request, item_id):
     if carrinho_itens:
         for carrinho_item in carrinho_itens:
             if carrinho_item.to_dict()['farmacia_id'] != farmacia_id:
-                messages.error(
+                messages.warning(
                     request, "Você só pode adicionar itens de uma única farmácia ao carrinho.")
                 return redirect('farmaciaLoja', farmacia_id=farmacia_id)
 
@@ -192,7 +203,7 @@ def adicionarAoCarrinho(request, item_id):
         })
 
     messages.success(request, "Item adicionado ao carrinho.")
-    return redirect('farmaciaLoja', farmacia_id=farmacia_id)
+    return redirect(request.META.get('HTTP_REFERER'), farmacia_id=farmacia_id)
 
 
 def finalizarPedido(request):
@@ -216,3 +227,20 @@ def finalizarPedido(request):
     # Redirecionar para uma página de confirmação ou outra página relevante
     # Substitua 'pagina_de_confirmacao' pela sua URL desejada
     return redirect('view_carrinho')
+
+
+def removerDoCarrinho(request, item_id):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        messages.error(request, "Você precisa estar logado para remover itens do carrinho.")
+        return redirect('login')
+
+    # Referência para a subcoleção 'carrinho' do usuário
+    carrinho_ref = db.collection('usuario').document(user_id).collection('carrinho')
+
+    # Remove o item do carrinho
+    carrinho_item_ref = carrinho_ref.document(item_id)
+    carrinho_item_ref.delete()
+
+    messages.success(request, "Item removido do carrinho.")
+    return redirect('view_carrinho')  # Redireciona de volta para a página do carrinho (altere conforme necessário)

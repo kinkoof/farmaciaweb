@@ -12,36 +12,47 @@ Pesquisa
 {% endblock title %}
 
 {% block body %}
+
 <body>
   <div class="container">
     <h1>Resultados da Pesquisa para "{{ query }}"</h1>
     <div class="row justify-content-center">
       {% if itens %}
-        {% for item in itens %}
-        <div class="col-12 col-md-8 mb-3">
-          <div class="card card-hover">
-            <div class="row no-gutters">
-              <div class="col-md-4">
-                <img src="{{ item.imagem_url }}" class="img-fluid rounded img-item" alt="Imagem do Item">
+      {% for item in itens %}
+      <div class="col-12 col-md-8 mb-3">
+        <div class="card card-hover">
+          <div class="row no-gutters">
+            <div class="col-md-4">
+              <img src="{{ item.imagem_url }}" class="img-fluid rounded img-item mt-2" alt="Imagem do Item">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body">
+                <h5 class="card-title">{{ item.nome }}</h5>
+                <p class="card-text">Preço: R$ {{ item.preco }}</p>
+                <p class="card-text">Farmácia: {{ item.farmacia.nomeFantasia }}</p>
+                <p class="card-text">{{ item.farmacia.endereco }}</p>
+                {% if item.farmacia.distancia is not None %}
+                <p class="card-text">Distância: {{ item.farmacia.distancia|floatformat:2 }} km</p>
+                {% endif %}
               </div>
-              <div class="col-md-8">
-                <div class="card-body">
-                  <h5 class="card-title">{{ item.nome }}</h5>
-                  <p class="card-text">Preço: R$ {{ item.preco }}</p>
-                  <p class="card-text">Farmácia: {{ item.farmacia.nomeFantasia }}</p>
-                  <p class="card-text">{{ item.farmacia.endereco }}</p>
-                  {% if item.farmacia.distancia is not None %}
-                  <p class="card-text">Distância: {{ item.farmacia.distancia|floatformat:2 }} km</p>
-                  {% endif %}
-                </div>
-              </div>
+              <form action="{% url 'adicionar_ao_carrinho' item.id %}" method="POST" class="text-center">
+                {% csrf_token %}
+                <button class="btn btn-custom-base mb-2" type="submit">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="60" height="30" fill="currentColor"
+                    class="bi bi-cart-fill" viewBox="0 0 16 16">
+                    <path
+                      d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                  </svg>
+                </button>
+              </form>
             </div>
           </div>
         </div>
-        <br><br>
-        {% endfor %}
+      </div>
+      <br><br>
+      {% endfor %}
       {% else %}
-        <p>Nenhum item encontrado correspondente a "{{ query }}".</p>
+      <p>Nenhum item encontrado correspondente a "{{ query }}".</p>
       {% endif %}
     </div>
   </div>
